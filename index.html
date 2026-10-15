@@ -1,0 +1,2114 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Database SDNMT 2027 — SD Negeri Model Terpadu Bojonegoro</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+  :root{ --biru-tua:#1e3a8a; --biru-muda:#3b82f6; --oranye:#f97316; }
+  body{font-family:'Inter','Segoe UI',sans-serif; background:#f1f5f9;}
+  .card{background:#fff; border-radius:1rem; box-shadow:0 10px 25px rgba(0,0,0,.06);}
+  .btn-oranye{background:var(--oranye); color:#fff; transition:.2s;}
+  .btn-oranye:hover{background:#ea580c; transform:translateY(-1px);}
+  .btn-biru{background:var(--biru-tua); color:#fff; transition:.2s;}
+  .btn-biru:hover{background:#1e40af; transform:translateY(-1px);}
+  .btn-edit{background:#8b5cf6; color:#fff; transition:.2s;}
+  .btn-edit:hover{background:#7c3aed;}
+  .btn-hijau{background:#16a34a; color:#fff; transition:.2s;}
+  .btn-hijau:hover{background:#15803d;}
+  .btn-merah{background:#dc2626; color:#fff; transition:.2s;}
+  .btn-merah:hover{background:#b91c1c;}
+  .sidebar{background:linear-gradient(180deg,var(--biru-tua),#1e40af);}
+  .sidebar a{transition:.2s;}
+  .sidebar a:hover{background:rgba(255,255,255,.15);}
+  .badge{background:var(--oranye); color:#fff; font-size:.7rem; padding:2px 8px; border-radius:999px;}
+  .badge-admin{background:#dc2626; color:#fff; font-size:.6rem; padding:2px 6px; border-radius:999px;}
+  .fade-in{animation:fadeIn .4s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .pulse-icon{animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+  .table-row:hover{background:#f8fafc;}
+  input[type=file]{display:none;}
+  .upload-label{display:flex; align-items:center; gap:.5rem; cursor:pointer; padding:.6rem 1rem; border:2px dashed #cbd5e1; border-radius:.75rem; transition:.2s; background:#fff;}
+  .upload-label:hover{border-color:var(--oranye); background:#fff7ed;}
+  .preview-box{max-height:200px; overflow:auto; border:1px solid #e2e8f0; border-radius:.5rem; padding:.5rem; background:#f9fafb;}
+  .input-field{width:100%; border:1px solid #cbd5e1; border-radius:.5rem; padding:.5rem .75rem; outline:none; transition:.2s;}
+  .input-field:focus{border-color:var(--oranye); box-shadow:0 0 0 3px rgba(249,115,22,.15);}
+  .wilayah-toggle{display:flex; gap:.5rem; flex-wrap:wrap;}
+  .wilayah-opt{flex:1; min-width:130px; text-align:center; padding:.6rem .8rem; border:2px solid #cbd5e1; border-radius:.75rem; cursor:pointer; transition:.2s; font-weight:600; color:#475569; background:#fff; font-size:.85rem;}
+  .wilayah-opt:hover{border-color:var(--oranye); color:var(--oranye);}
+  .wilayah-opt.active{background:var(--biru-tua); color:#fff; border-color:var(--biru-tua);}
+  .age-box{background:linear-gradient(135deg,#eff6ff,#fff7ed); border:1px solid #bfdbfe; border-radius:.75rem; padding:.75rem 1rem; margin-top:.5rem;}
+  .age-item{display:flex; flex-direction:column; align-items:center; padding:.25rem .75rem;}
+  .age-num{font-size:1.5rem; font-weight:800; color:var(--biru-tua); line-height:1;}
+  .age-lbl{font-size:.65rem; color:#64748b; text-transform:uppercase; letter-spacing:.05em; margin-top:.2rem;}
+  .age-sep{font-size:1.25rem; font-weight:700; color:#cbd5e1; align-self:center;}
+  .success-checkmark{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 10px 30px rgba(16,185,129,.4);animation:popIn .6s cubic-bezier(.175,.885,.32,1.275), pulseSuccess 2s infinite 1s;}
+  @keyframes popIn{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+  @keyframes pulseSuccess{0%,100%{box-shadow:0 10px 30px rgba(16,185,129,.4)}50%{box-shadow:0 10px 40px rgba(16,185,129,.8)}}
+  .success-checkmark i{animation:checkPop .5s ease-out .3s both;}
+  @keyframes checkPop{0%{transform:scale(0) rotate(-45deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+  .success-text{animation:slideUp .5s ease-out .5s both;}
+  @keyframes slideUp{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:none}}
+  .detail-label{color:#64748b;font-size:.75rem;text-transform:uppercase;letter-spacing:.03em;font-weight:600;}
+  .detail-value{color:#1e293b;font-size:.95rem;font-weight:500;}
+  .note-box{background:linear-gradient(135deg,#fef3c7,#fde68a);border-left:6px solid #f59e0b;border-radius:.75rem;padding:1.25rem 1.5rem;box-shadow:0 4px 15px rgba(245,158,11,.15);}
+  .note-icon{animation:bellShake 3s infinite;}
+  @keyframes bellShake{0%,90%,100%{transform:rotate(0)}92%,96%{transform:rotate(15deg)}94%,98%{transform:rotate(-15deg)}}
+  #mapPicker{height:300px; border-radius:.75rem; overflow:hidden; border:2px solid #cbd5e1; width:100%;}
+  .leaflet-container{font-family:'Inter','Segoe UI',sans-serif;}
+  .jarak-badge{background:linear-gradient(135deg,#dbeafe,#bfdbfe); color:#1e40af; font-weight:700; padding:.25rem .6rem; border-radius:999px; font-size:.75rem; white-space:nowrap;}
+  .jarak-badge.close{background:linear-gradient(135deg,#dcfce7,#bbf7d0); color:#166534;}
+  .jarak-badge.far{background:linear-gradient(135deg,#fee2e2,#fecaca); color:#991b1b;}
+  .status-online{background:#16a34a; color:#fff; font-size:.7rem; padding:3px 10px; border-radius:999px; display:inline-flex; align-items:center; gap:5px; font-weight:600;}
+  .status-offline{background:#dc2626; color:#fff; font-size:.7rem; padding:3px 10px; border-radius:999px; display:inline-flex; align-items:center; gap:5px; font-weight:600;}
+  .status-loading{background:#eab308; color:#fff; font-size:.7rem; padding:3px 10px; border-radius:999px; display:inline-flex; align-items:center; gap:5px; font-weight:600;}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+  .dot-status{width:8px;height:8px;border-radius:50%;background:#fff;animation:blink 1.5s infinite;}
+  .loading-spinner{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:1rem;}
+  .loading-spinner.active{display:flex;}
+  .spinner{width:60px;height:60px;border:6px solid rgba(255,255,255,.3);border-top-color:#f97316;border-radius:50%;animation:spin 1s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .setup-step{background:#f8fafc; border-left:4px solid #1e3a8a; padding:1rem 1.25rem; border-radius:.5rem; margin-bottom:.75rem;}
+  .setup-step h4{font-weight:700; color:#1e3a8a; margin-bottom:.5rem; font-size:.95rem;}
+  .setup-step ol{list-style:decimal; padding-left:1.25rem; font-size:.85rem; color:#475569; line-height:1.7;}
+  .setup-step code{background:#fef3c7; color:#92400e; padding:2px 6px; border-radius:4px; font-size:.8rem;}
+  .connection-status{padding:1rem 1.25rem; border-radius:.75rem; margin-top:1rem; display:flex; align-items:center; gap:.75rem;}
+  .connection-status.connected{background:linear-gradient(135deg,#dcfce7,#bbf7d0); border-left:4px solid #16a34a;}
+  .connection-status.disconnected{background:linear-gradient(135deg,#fee2e2,#fecaca); border-left:4px solid #dc2626;}
+  .connection-status.unknown{background:linear-gradient(135deg,#fef3c7,#fde68a); border-left:4px solid #f59e0b;}
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- LOADING OVERLAY -->
+<div id="loadingOverlay" class="loading-spinner">
+  <div class="spinner"></div>
+  <p class="text-white text-lg font-semibold" id="loadingText">Memuat...</p>
+</div>
+
+<!-- HEADER -->
+<header class="sidebar text-white px-4 md:px-6 py-4 flex items-center justify-between shadow-lg relative z-20">
+  <div class="flex items-center gap-3 md:gap-4">
+    <img id="logoHeader" src="https://via.placeholder.com/60/1e3a8a/ffffff?text=SD" class="w-12 h-12 md:w-14 md:h-14 rounded-full border-2 border-white object-cover bg-white" alt="Logo"/>
+    <div>
+      <h1 class="text-base md:text-lg font-bold leading-tight">DATABASE SDNMT 2027</h1>
+      <p class="text-xs opacity-80">SD Negeri Model Terpadu Bojonegoro</p>
+    </div>
+  </div>
+  <div class="flex items-center gap-2 md:gap-3">
+    <span id="statusOnline" class="status-loading">
+      <span class="dot-status"></span> <span id="statusText" class="hidden sm:inline">Memuat...</span>
+    </span>
+    <span id="adminBadge" class="badge hidden"><i class="fas fa-shield-alt mr-1"></i>Admin</span>
+    <button onclick="toggleLogin()" class="btn-oranye px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2">
+      <i class="fas fa-user-lock pulse-icon"></i> <span id="loginBtnText" class="hidden sm:inline">Login Admin</span>
+    </button>
+  </div>
+</header>
+
+<div class="flex min-h-[calc(100vh-80px)]">
+
+  <aside id="sidebar" class="sidebar w-64 text-white p-4 flex flex-col gap-2 transition-all duration-300 shrink-0">
+    <button onclick="toggleSidebar()" class="self-end mb-2 text-sm opacity-70 hover:opacity-100">
+      <i class="fas fa-chevron-left" id="sidebarIcon"></i>
+    </button>
+    <a href="#" onclick="showPage('dashboard')" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/15">
+      <i class="fas fa-chart-pie w-5"></i> <span class="menu-text">Dashboard</span>
+    </a>
+    <a href="#" onclick="showPage('inden')" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/15">
+      <i class="fas fa-file-signature w-5"></i> <span class="menu-text">Isi Formulir</span>
+    </a>
+    <a href="#" onclick="showPage('daftar')" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/15">
+      <i class="fas fa-database w-5"></i> <span class="menu-text">Database</span>
+    </a>
+    <a href="#" onclick="showPage('pengaturan')" id="menuPengaturan" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/15 hidden" style="display:none;">
+      <i class="fas fa-cog w-5"></i> <span class="menu-text">Pengaturan</span>
+      <span class="badge-admin ml-auto text-xs">ADMIN</span>
+    </a>
+    <div class="mt-auto border-t border-white/20 pt-4">
+      <p class="text-xs opacity-60 px-4">© 2027 SDNMT</p>
+    </div>
+  </aside>
+
+  <main class="flex-1 p-3 md:p-6 overflow-auto">
+
+    <!-- ============ DASHBOARD ============ -->
+    <section id="page-dashboard" class="page fade-in" style="display:block;">
+      <h2 class="text-xl md:text-2xl font-bold text-slate-800 mb-4 md:mb-6"><i class="fas fa-chart-pie text-orange-500 mr-2"></i>Dashboard</h2>
+
+      <div class="note-box mb-4 md:mb-6 fade-in">
+        <div class="flex items-start gap-3 md:gap-4">
+          <div class="text-3xl md:text-4xl note-icon"><i class="fas fa-bullhorn text-amber-600"></i></div>
+          <div class="flex-1">
+            <p class="font-bold text-amber-900 text-base md:text-lg mb-2 flex items-center gap-2">
+              <i class="fas fa-exclamation-triangle"></i>Catatan Penting
+            </p>
+            <p class="text-amber-900 leading-relaxed text-xs md:text-base">
+              Pengisian formulir <b>tidak berarti diterima</b> sebagai siswa baru tahun pelajaran 2027/2028.
+              SPMB 2027/2028 tetap mengacu pada <b>Juknis dan peraturan dari Dinas Pendidikan Bojonegoro</b>.
+              Terima kasih.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div id="infoKoneksi" class="card p-3 md:p-4 mb-4 md:mb-6 bg-blue-50 border-l-4 border-blue-600">
+        <p class="text-xs md:text-sm text-blue-900">
+          <i class="fas fa-table text-blue-600 mr-2"></i>
+          <span id="koneksiStatusText">Memeriksa koneksi Google Spreadsheet...</span>
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-5 mb-4 md:mb-8">
+        <div class="card p-4 md:p-6 flex items-center gap-4 md:gap-5">
+          <div class="w-14 h-14 md:w-16 md:h-16 rounded-full bg-blue-900 text-white flex items-center justify-center text-xl md:text-2xl"><i class="fas fa-users pulse-icon"></i></div>
+          <div><p class="text-slate-500 text-xs md:text-sm">Kuota Penerimaan</p><p class="text-2xl md:text-3xl font-bold text-blue-900">84</p><p class="text-xs text-slate-400">siswa</p></div>
+        </div>
+        <div class="card p-4 md:p-6 flex items-center gap-4 md:gap-5">
+          <div class="w-14 h-14 md:w-16 md:h-16 rounded-full bg-orange-500 text-white flex items-center justify-center text-xl md:text-2xl"><i class="fas fa-layer-group pulse-icon"></i></div>
+          <div><p class="text-slate-500 text-xs md:text-sm">Jumlah Rombel</p><p class="text-2xl md:text-3xl font-bold text-orange-500">3</p><p class="text-xs text-slate-400">rombel</p></div>
+        </div>
+        <div class="card p-4 md:p-6 flex items-center gap-4 md:gap-5">
+          <div class="w-14 h-14 md:w-16 md:h-16 rounded-full bg-blue-400 text-white flex items-center justify-center text-xl md:text-2xl"><i class="fas fa-check-circle pulse-icon"></i></div>
+          <div><p class="text-slate-500 text-xs md:text-sm">Total Data Masuk</p><p class="text-2xl md:text-3xl font-bold text-blue-500" id="totalInden">0</p><p class="text-xs text-slate-400">pendaftar</p></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+        <div class="card p-4 md:p-6">
+          <h3 class="font-semibold text-slate-700 mb-4 text-sm md:text-base"><i class="fas fa-chart-donut text-orange-500 mr-2"></i>Jumlah Data Masuk</h3>
+          <div class="flex justify-center"><canvas id="chartInden" width="260" height="260"></canvas></div>
+          <p class="text-center mt-3 text-2xl font-bold text-blue-900" id="labelInden">0</p>
+        </div>
+        <div class="card p-4 md:p-6">
+          <h3 class="font-semibold text-slate-700 mb-4 text-sm md:text-base"><i class="fas fa-venus-mars text-orange-500 mr-2"></i>Laki-laki vs Perempuan</h3>
+          <div class="flex justify-center"><canvas id="chartGender" width="260" height="260"></canvas></div>
+          <div class="grid grid-cols-2 gap-4 mt-4 text-center">
+            <div><p class="text-slate-500 text-xs md:text-sm">Laki-laki</p><p class="text-xl md:text-2xl font-bold text-blue-600" id="labelL">0</p><p class="text-xs text-slate-400" id="persenL">0%</p></div>
+            <div><p class="text-slate-500 text-xs md:text-sm">Perempuan</p><p class="text-xl md:text-2xl font-bold text-pink-500" id="labelP">0</p><p class="text-xs text-slate-400" id="persenP">0%</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card p-4 md:p-6 mt-4 md:mt-6 flex flex-wrap items-center gap-4 md:gap-6">
+        <img id="adminPhoto" src="https://via.placeholder.com/100/1e3a8a/ffffff?text=A" class="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border-4 border-orange-400 bg-white" alt="Admin"/>
+        <div>
+          <p class="text-sm text-slate-500">Administrator</p>
+          <p class="font-bold text-base md:text-lg text-blue-900">SD Negeri Model Terpadu Bojonegoro</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ISI FORMULIR ============ -->
+    <section id="page-inden" class="page hidden fade-in" style="display:none;">
+      <h2 class="text-xl md:text-2xl font-bold text-slate-800 mb-4 md:mb-6"><i class="fas fa-file-signature text-orange-500 mr-2"></i>Isi Formulir</h2>
+      <form id="formInden" onsubmit="simpanInden(event)" class="card p-4 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+
+        <div class="md:col-span-2"><h3 class="font-semibold text-blue-900 border-b pb-2 mb-2 text-sm md:text-base"><i class="fas fa-child mr-2"></i>Data Siswa</h3></div>
+        <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1">Nama Lengkap *</label><input name="nama" required class="input-field"/></div>
+        <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1">NISN *</label><input name="nisn" required class="input-field"/></div>
+        <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1">Jenis Kelamin *</label>
+          <select name="jk" required class="input-field"><option value="">-- Pilih --</option><option value="L">Laki-laki</option><option value="P">Perempuan</option></select>
+        </div>
+        <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1">Tempat Lahir *</label><input name="tempatLahir" required class="input-field"/></div>
+
+        <div>
+          <label class="block text-xs md:text-sm font-medium text-slate-600 mb-1">Tanggal Lahir *</label>
+          <input name="tglLahir" id="inputTglLahir" type="date" required onchange="hitungUmur()" oninput="hitungUmur()" class="input-field"/>
+          <div id="ageBox" class="age-box hidden">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-cake-candles text-orange-500 text-lg md:text-xl"></i>
+                <span class="text-xs md:text-sm font-semibold text-slate-700">Usia Saat Ini:</span>
+              </div>
+              <span class="text-xs text-slate-400" id="ageRefDate"></span>
+            </div>
+            <div class="flex items-center justify-center mt-2">
+              <div class="age-item"><span class="age-num" id="ageTahun">0</span><span class="age-lbl">Tahun</span></div>
+              <span class="age-sep">•</span>
+              <div class="age-item"><span class="age-num" id="ageBulan">0</span><span class="age-lbl">Bulan</span></div>
+              <span class="age-sep">•</span>
+              <div class="age-item"><span class="age-num" id="ageHari">0</span><span class="age-lbl">Hari</span></div>
+            </div>
+            <p class="text-xs text-center text-slate-500 mt-1" id="ageText">—</p>
+          </div>
+          <input type="hidden" name="umurSiswa" id="umurHidden"/>
+        </div>
+
+        <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1">NIK Siswa *</label><input name="nik" required class="input-field"/></div>
+        <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1"><i class="fas fa-id-card text-orange-500 mr-1"></i>No. Kartu Keluarga (KK) *</label>
+          <input name="noKK" required placeholder="Contoh: 3516xxxxxxxxxxxx" class="input-field"/>
+        </div>
+        <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1">Asal Sekolah *</label>
+          <input name="asalSekolah" required placeholder="Contoh: TK Pertiwi Bojonegoro" class="input-field"/>
+        </div>
+        <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1">Agama *</label>
+          <select name="agama" required class="input-field"><option value="">-- Pilih --</option><option>Islam</option><option>Kristen</option><option>Katolik</option><option>Hindu</option><option>Buddha</option><option>Konghucu</option></select>
+        </div>
+        <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1">Alamat Jalan *</label><input name="alamat" required class="input-field"/></div>
+        <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1">RT/RW *</label><input name="rtrw" required class="input-field"/></div>
+        <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1">Kode Pos</label><input name="kodepos" class="input-field"/></div>
+
+        <div class="md:col-span-2 mt-4">
+          <h3 class="font-semibold text-blue-900 border-b pb-2 mb-3 text-sm md:text-base"><i class="fas fa-map-marker-alt mr-2"></i>Wilayah Domisili</h3>
+          <label class="block text-xs md:text-sm font-medium text-slate-600 mb-2">Pilih Wilayah *</label>
+          <div class="wilayah-toggle mb-4">
+            <div id="optDalam" class="wilayah-opt active" onclick="setWilayah('dalam')"><i class="fas fa-map-marked-alt mr-1"></i> Dalam Kab. Bojonegoro</div>
+            <div id="optLuar" class="wilayah-opt" onclick="setWilayah('luar')"><i class="fas fa-globe mr-1"></i> Luar Kab. Bojonegoro</div>
+          </div>
+          <input type="hidden" name="modeWilayah" id="modeWilayah" value="dalam"/>
+
+          <div id="wilayahDalam" class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
+            <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1">Kecamatan *</label>
+              <select name="kecamatan" id="selKec" onchange="isiDesa()" class="input-field" required><option value="">-- Pilih Kecamatan --</option></select>
+            </div>
+            <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1">Desa/Kelurahan *</label>
+              <select name="desa" id="selDesa" class="input-field" required><option value="">-- Pilih Desa --</option></select>
+            </div>
+            <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1">Kabupaten</label>
+              <input name="kabupaten" value="Bojonegoro" readonly class="input-field bg-slate-100"/>
+            </div>
+          </div>
+
+          <div id="wilayahLuar" class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 hidden">
+            <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1">Desa/Kelurahan *</label><input name="desaLuar" placeholder="Nama desa/kelurahan" class="input-field"/></div>
+            <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1">Kecamatan *</label><input name="kecamatanLuar" placeholder="Nama kecamatan" class="input-field"/></div>
+            <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1">Kabupaten/Kota *</label><input name="kabupatenLuar" placeholder="Nama kabupaten/kota" class="input-field"/></div>
+            <div class="md:col-span-3"><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1">Provinsi</label><input name="provinsiLuar" placeholder="Contoh: Jawa Timur" class="input-field"/></div>
+          </div>
+        </div>
+
+        <div class="md:col-span-2 mt-4">
+          <h3 class="font-semibold text-blue-900 border-b pb-2 mb-3 text-sm md:text-base"><i class="fas fa-map-marked-alt mr-2"></i>Lokasi Rumah & Jarak ke Sekolah</h3>
+          <p class="text-xs text-slate-500 mb-2"><i class="fas fa-info-circle text-blue-500 mr-1"></i>Klik pada peta untuk menandai lokasi rumah Anda.</p>
+          <div class="flex flex-wrap gap-2 mb-2 text-xs">
+            <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded-full"><i class="fas fa-school mr-1"></i>Sekolah</span>
+            <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full"><i class="fas fa-home mr-1"></i>Rumah Anda</span>
+          </div>
+          <div id="mapPicker"></div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
+            <div class="card p-3 bg-slate-50">
+              <p class="text-xs text-slate-500 mb-1"><i class="fas fa-crosshairs mr-1"></i>Latitude</p>
+              <p class="font-bold text-slate-700 text-xs md:text-sm" id="displayLat">-</p>
+            </div>
+            <div class="card p-3 bg-slate-50">
+              <p class="text-xs text-slate-500 mb-1"><i class="fas fa-crosshairs mr-1"></i>Longitude</p>
+              <p class="font-bold text-slate-700 text-xs md:text-sm" id="displayLng">-</p>
+            </div>
+            <div class="card p-3 bg-blue-50 border-2 border-blue-200">
+              <p class="text-xs text-blue-600 mb-1"><i class="fas fa-route mr-1"></i>Jarak ke Sekolah</p>
+              <p class="font-bold text-blue-900 text-base md:text-lg" id="displayJarak">-</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2 mt-2">
+            <button type="button" onclick="deteksiLokasiSaya()" class="text-xs px-3 py-2 bg-blue-100 text-blue-700 rounded-lg font-semibold hover:bg-blue-200 transition">
+              <i class="fas fa-location-crosshairs mr-1"></i>Deteksi Lokasi Saya
+            </button>
+            <button type="button" onclick="resetLokasi()" class="text-xs px-3 py-2 bg-slate-100 text-slate-600 rounded-lg font-semibold hover:bg-slate-200 transition">
+              <i class="fas fa-redo mr-1"></i>Reset
+            </button>
+          </div>
+          <input type="hidden" name="latRumah" id="hiddenLat"/>
+          <input type="hidden" name="lngRumah" id="hiddenLng"/>
+          <input type="hidden" name="jarakRumah" id="hiddenJarak"/>
+          <input type="hidden" name="jarakNum" id="hiddenJarakNum"/>
+        </div>
+
+        <div class="md:col-span-2 mt-4"><h3 class="font-semibold text-blue-900 border-b pb-2 mb-2 text-sm md:text-base"><i class="fas fa-users mr-2"></i>Data Orang Tua & Wali</h3></div>
+        <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1">Nama Ayah *</label><input name="namaAyah" required class="input-field"/></div>
+        <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1">Pekerjaan Ayah *</label><input name="kerjaAyah" required class="input-field"/></div>
+        <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1"><i class="fas fa-money-bill-wave text-green-500 mr-1"></i>Gaji Ayah *</label>
+          <select name="gajiAyah" id="gajiAyah" required class="input-field"><option value="">-- Pilih --</option></select>
+        </div>
+        <div></div>
+
+        <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1">Nama Ibu *</label><input name="namaIbu" required class="input-field"/></div>
+        <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1">Pekerjaan Ibu *</label><input name="kerjaIbu" required class="input-field"/></div>
+        <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1"><i class="fas fa-money-bill-wave text-green-500 mr-1"></i>Gaji Ibu *</label>
+          <select name="gajiIbu" id="gajiIbu" required class="input-field"><option value="">-- Pilih --</option></select>
+        </div>
+        <div></div>
+
+        <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1"><i class="fas fa-user-shield text-purple-500 mr-1"></i>Nama Wali</label>
+          <input name="waliSiswa" placeholder="Opsional" class="input-field"/>
+        </div>
+        <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1">Pekerjaan Wali</label>
+          <input name="kerjaWali" placeholder="Opsional" class="input-field"/>
+        </div>
+        <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1"><i class="fas fa-money-bill-wave text-purple-500 mr-1"></i>Gaji Wali</label>
+          <select name="gajiWali" id="gajiWali" class="input-field"><option value="">-- Pilih --</option></select>
+        </div>
+        <div></div>
+
+        <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1">No. HP Orang Tua / Wali *</label><input name="hpOrtu" required class="input-field"/></div>
+        <div><label class="block text-xs md:text-sm font-medium text-slate-600 mb-1">Email</label><input name="email" type="email" placeholder="Opsional" class="input-field"/></div>
+
+        <div class="md:col-span-2 mt-4"><h3 class="font-semibold text-blue-900 border-b pb-2 mb-2 text-sm md:text-base"><i class="fas fa-file-pdf mr-2"></i>Unggah Berkas (max 2MB)</h3></div>
+        <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+          <div>
+            <label class="upload-label w-full text-xs md:text-sm"><i class="fas fa-id-card text-orange-500"></i> KK <span class="text-red-500">*</span>
+              <span class="text-xs text-slate-400 ml-auto">PDF</span>
+              <input type="file" accept="application/pdf" required onchange="validasiFile(this,'fileKK','pdf')"/>
+            </label>
+            <div id="preview-fileKK" class="preview-box mt-2 hidden"></div>
+          </div>
+          <div>
+            <label class="upload-label w-full text-xs md:text-sm"><i class="fas fa-id-card-alt text-blue-500"></i> KTP Orang Tua <span class="text-red-500">*</span>
+              <span class="text-xs text-slate-400 ml-auto">PDF</span>
+              <input type="file" accept="application/pdf" required onchange="validasiFile(this,'fileKTP','pdf')"/>
+            </label>
+            <div id="preview-fileKTP" class="preview-box mt-2 hidden"></div>
+          </div>
+          <div>
+            <label class="upload-label w-full text-xs md:text-sm"><i class="fas fa-baby text-green-500"></i> Akta Kelahiran <span class="text-red-500">*</span>
+              <span class="text-xs text-slate-400 ml-auto">PDF</span>
+              <input type="file" accept="application/pdf" required onchange="validasiFile(this,'fileAkta','pdf')"/>
+            </label>
+            <div id="preview-fileAkta" class="preview-box mt-2 hidden"></div>
+          </div>
+          <div>
+            <label class="upload-label w-full text-xs md:text-sm"><i class="fas fa-camera text-pink-500"></i> Foto 3×4 <span class="text-red-500">*</span>
+              <span class="text-xs text-slate-400 ml-auto">JPEG</span>
+              <input type="file" accept="image/jpeg,image/jpg" required onchange="validasiFile(this,'fileFoto','jpeg')"/>
+            </label>
+            <div id="preview-fileFoto" class="preview-box mt-2 hidden"></div>
+          </div>
+        </div>
+
+        <div class="md:col-span-2 text-right mt-6">
+          <button type="submit" id="btnSubmit" class="btn-oranye px-6 md:px-8 py-3 rounded-lg font-semibold text-base md:text-lg shadow-lg hover:shadow-xl transition w-full md:w-auto">
+            <i class="fas fa-paper-plane mr-2"></i>Simpan Formulir
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ============ DATABASE ============ -->
+    <section id="page-daftar" class="page hidden fade-in" style="display:none;">
+      <div class="flex flex-wrap items-center justify-between mb-4 md:mb-6 gap-3 md:gap-4">
+        <h2 class="text-xl md:text-2xl font-bold text-slate-800"><i class="fas fa-database text-orange-500 mr-2"></i>Database Keseluruhan</h2>
+        <div class="flex items-center gap-3 flex-wrap">
+          <button onclick="refreshData()" class="btn-biru px-4 py-2 rounded-lg font-semibold flex items-center gap-2 shadow hover:shadow-lg transition text-sm">
+            <i class="fas fa-sync-alt"></i> Refresh
+          </button>
+          <button id="btnDownloadPDF" onclick="downloadDatabasePDF()" class="btn-biru px-4 py-2 rounded-lg font-semibold flex items-center gap-2 shadow hover:shadow-lg transition hidden text-sm">
+            <i class="fas fa-file-pdf pulse-icon"></i> PDF
+          </button>
+          <button id="btnDownloadExcel" onclick="downloadDatabaseExcel()" class="btn-hijau px-4 py-2 rounded-lg font-semibold flex items-center gap-2 shadow hover:shadow-lg transition hidden text-sm">
+            <i class="fas fa-file-excel pulse-icon"></i> Excel
+          </button>
+          <span id="infoDownloadDaftar" class="text-xs text-slate-400 italic flex items-center gap-2">
+            <i class="fas fa-lock"></i> Login admin untuk mengunduh
+          </span>
+        </div>
+      </div>
+
+      <div class="card p-3 md:p-4 mb-4 bg-blue-50 border-l-4 border-blue-900">
+        <p class="text-xs md:text-sm text-slate-700">
+          <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+          Data diurutkan berdasarkan <b>jarak rumah ke sekolah</b> (terdekat ke terjauh).
+          <span id="adminActionInfo" class="hidden">Admin dapat <b>mengedit</b>, <b>menghapus</b>, <b>melihat detail</b>, dan <b>mengunduh PDF per siswa</b>.</span>
+        </p>
+      </div>
+
+      <div class="card p-3 md:p-6 overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-blue-900 text-white">
+            <tr>
+              <th class="p-2 md:p-3 text-left rounded-tl-lg">No</th>
+              <th class="p-2 md:p-3 text-left">Nama</th>
+              <th class="p-2 md:p-3">JK</th>
+              <th class="p-2 md:p-3 text-left">Usia</th>
+              <th class="p-2 md:p-3 text-left">Asal Sekolah</th>
+              <th class="p-2 md:p-3 text-left">Wali</th>
+              <th class="p-2 md:p-3 text-center">Jarak</th>
+              <th class="p-2 md:p-3 text-left">Wilayah</th>
+              <th class="p-2 md:p-3 rounded-tr-lg">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyInden"></tbody>
+        </table>
+        <p id="emptyMsg" class="text-center text-slate-400 py-8 text-sm"><i class="fas fa-inbox mr-2"></i>Belum ada data inden.</p>
+      </div>
+    </section>
+
+    <!-- ============ PENGATURAN (ADMIN ONLY) ============ -->
+    <section id="page-pengaturan" class="page hidden fade-in" style="display:none;">
+      <h2 class="text-xl md:text-2xl font-bold text-slate-800 mb-4 md:mb-6">
+        <i class="fas fa-cog text-orange-500 mr-2"></i>Pengaturan
+        <span class="badge-admin text-xs align-middle ml-2">ADMIN</span>
+      </h2>
+
+      <div class="card p-4 md:p-6 mb-4">
+        <div class="flex items-center justify-between border-b pb-2 mb-4">
+          <h3 class="font-bold text-blue-900 text-base md:text-lg">
+            <i class="fas fa-table text-green-600 mr-2"></i>Koneksi Google Spreadsheet
+          </h3>
+          <span id="badgeLocked" class="hidden bg-green-600 text-white text-xs px-3 py-1 rounded-full flex items-center gap-1">
+            <i class="fas fa-lock"></i> URL Terkunci
+          </span>
+        </div>
+        <p class="text-xs md:text-sm text-slate-600 mb-4">
+          Masukkan URL <b>Apps Script Web App</b> untuk menghubungkan aplikasi dengan Google Spreadsheet.
+          Setelah disimpan, URL akan <b>terkunci otomatis</b>.
+        </p>
+
+        <label class="block text-xs md:text-sm font-medium text-slate-700 mb-2">
+          <i class="fas fa-link text-orange-500 mr-1"></i>URL Apps Script Web App
+        </label>
+        <input id="inputApiUrl" type="text" placeholder="https://script.google.com/macros/s/AKfycb.../exec" class="input-field font-mono text-xs md:text-sm mb-3"/>
+
+        <div class="flex flex-wrap gap-2">
+          <button onclick="testKoneksi()" class="btn-biru px-4 py-2 rounded-lg font-semibold flex items-center gap-2 text-sm">
+            <i class="fas fa-plug"></i> Test Koneksi
+          </button>
+          <button id="btnSimpan" onclick="simpanPengaturan()" class="btn-hijau px-4 py-2 rounded-lg font-semibold flex items-center gap-2 text-sm">
+            <i class="fas fa-lock"></i> Simpan & Kunci
+          </button>
+          <button id="btnUnlock" onclick="unlockApiUrl()" class="btn-oranye px-4 py-2 rounded-lg font-semibold flex items-center gap-2 text-sm hidden">
+            <i class="fas fa-lock-open"></i> Unlock
+          </button>
+          <button id="btnReset" onclick="resetPengaturan()" class="btn-merah px-4 py-2 rounded-lg font-semibold flex items-center gap-2 text-sm">
+            <i class="fas fa-trash"></i> Reset
+          </button>
+        </div>
+
+        <div id="statusKoneksi" class="connection-status unknown">
+          <i class="fas fa-question-circle text-2xl text-amber-600"></i>
+          <div>
+            <p class="font-bold text-slate-800 text-sm">Status: <span id="statusKoneksiText">Belum Diuji</span></p>
+            <p class="text-xs text-slate-600" id="statusKoneksiDetail">Masukkan URL lalu klik "Test Koneksi"</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card p-4 md:p-6 mb-4 bg-green-50 border-2 border-green-300">
+        <h3 class="font-bold text-green-900 border-b pb-2 mb-4 text-base md:text-lg">
+          <i class="fas fa-share-alt text-green-600 mr-2"></i>Distribusi ke Device Lain
+        </h3>
+        <p class="text-xs md:text-sm text-green-900 mb-4">
+          Agar aplikasi <b>otomatis terhubung</b> di semua device (laptop/HP lain):
+        </p>
+
+        <div class="flex flex-wrap gap-2 mb-4">
+          <button onclick="downloadPreconfiguredHTML()" class="btn-hijau px-4 py-2 rounded-lg font-semibold flex items-center gap-2 text-sm shadow">
+            <i class="fas fa-download"></i> Download File HTML Terkonfigurasi
+          </button>
+          <button onclick="showUrlForHardcode()" class="btn-biru px-4 py-2 rounded-lg font-semibold flex items-center gap-2 text-sm">
+            <i class="fas fa-code"></i> Copy Baris Kode URL
+          </button>
+        </div>
+
+        <div class="bg-white p-3 md:p-4 rounded-lg border border-green-200">
+          <p class="text-xs md:text-sm font-semibold text-green-900 mb-2">
+            <i class="fas fa-info-circle mr-1"></i>Cara distribusi:
+          </p>
+          <ol class="text-xs md:text-sm text-slate-700 list-decimal pl-5 space-y-1">
+            <li>Klik <b>"Download File HTML Terkonfigurasi"</b> → dapat file HTML baru yang sudah berisi URL</li>
+            <li>Upload file ke hosting gratis: <b>Netlify Drop</b> (drag-drop), <b>GitHub Pages</b>, atau <b>Firebase Hosting</b></li>
+            <li>Bagikan URL hosting ke pengguna</li>
+            <li>Semua device yang buka URL tersebut akan <b>OTOMATIS terhubung</b></li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="card p-4 md:p-6 mb-4">
+        <h3 class="font-bold text-blue-900 border-b pb-2 mb-4 text-base md:text-lg">
+          <i class="fas fa-info-circle text-blue-600 mr-2"></i>Informasi Koneksi
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="card p-4 bg-slate-50">
+            <p class="text-xs text-slate-500 mb-1">URL Tersimpan</p>
+            <p class="font-bold text-slate-700 text-xs break-all" id="infoUrl">-</p>
+          </div>
+          <div class="card p-4 bg-slate-50">
+            <p class="text-xs text-slate-500 mb-1">Total Data dari Cloud</p>
+            <p class="font-bold text-blue-900 text-lg" id="infoTotalCloud">-</p>
+          </div>
+          <div class="card p-4 bg-slate-50">
+            <p class="text-xs text-slate-500 mb-1">Data Lokal (Cache)</p>
+            <p class="font-bold text-slate-700 text-lg" id="infoTotalLocal">0</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card p-4 md:p-6">
+        <h3 class="font-bold text-blue-900 border-b pb-2 mb-4 text-base md:text-lg">
+          <i class="fas fa-book text-orange-500 mr-2"></i>Panduan Setup Google Spreadsheet
+        </h3>
+
+        <div class="setup-step">
+          <h4><i class="fas fa-table mr-2"></i>Langkah 1: Buat Google Spreadsheet</h4>
+          <ol>
+            <li>Buka <a href="https://sheets.google.com" target="_blank" class="text-blue-600 underline">https://sheets.google.com</a></li>
+            <li>Klik <b>Blank spreadsheet</b></li>
+            <li>Beri nama: <code>Database SDNMT 2027</code></li>
+          </ol>
+        </div>
+
+        <div class="setup-step">
+          <h4><i class="fas fa-code mr-2"></i>Langkah 2: Buat Apps Script</h4>
+          <ol>
+            <li>Di Spreadsheet, klik menu <b>Extensions → Apps Script</b></li>
+            <li>Hapus semua kode yang ada</li>
+            <li>Klik tombol <b>"Lihat Kode Apps Script"</b> di bawah → Copy → Paste</li>
+            <li>Klik <b>Save</b> (Ctrl+S) → beri nama <code>Database SDNMT API</code></li>
+          </ol>
+        </div>
+
+        <div class="setup-step">
+          <h4><i class="fas fa-rocket mr-2"></i>Langkah 3: Deploy sebagai Web App</h4>
+          <ol>
+            <li>Klik <b>Deploy → New deployment</b></li>
+            <li>Pilih type: <b>Web app</b></li>
+            <li>Execute as: <b>Me</b></li>
+            <li>Who has access: <b>Anyone</b></li>
+            <li>Klik <b>Deploy</b> → izinkan akses</li>
+            <li>Copy <b>Web app URL</b> (berakhiran <code>/exec</code>)</li>
+          </ol>
+        </div>
+
+        <div class="setup-step">
+          <h4><i class="fas fa-lock mr-2"></i>Langkah 4: Simpan & Kunci URL</h4>
+          <ol>
+            <li>Paste URL di kolom atas</li>
+            <li>Klik <b>Test Koneksi</b> untuk memastikan</li>
+            <li>Klik <b>"Simpan & Kunci"</b> — URL akan terkunci otomatis</li>
+            <li>Download file HTML terkonfigurasi untuk distribusi</li>
+          </ol>
+        </div>
+
+        <button onclick="toggleKodeAppsScript()" class="btn-biru px-4 py-2 rounded-lg font-semibold flex items-center gap-2 text-sm mt-2">
+          <i class="fas fa-code"></i> Lihat Kode Apps Script
+        </button>
+
+        <div id="kodeAppsScript" class="hidden mt-3">
+          <textarea readonly class="w-full h-96 p-3 bg-slate-900 text-green-400 font-mono text-xs rounded-lg" id="textareaKode"></textarea>
+          <button onclick="copyKodeAppsScript()" class="btn-hijau px-4 py-2 rounded-lg font-semibold flex items-center gap-2 text-sm mt-2">
+            <i class="fas fa-copy"></i> Copy Kode
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- MODAL LOGIN -->
+<div id="modalLogin" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
+  <div class="card p-6 md:p-8 w-80 fade-in">
+    <h3 class="text-xl font-bold text-blue-900 mb-4"><i class="fas fa-lock mr-2"></i>Login Admin</h3>
+    <input id="inUser" placeholder="Username" class="input-field mb-3"/>
+    <input id="inPass" type="password" placeholder="Password" class="input-field mb-4"/>
+    <div class="flex gap-3">
+      <button onclick="doLogin()" class="btn-biru flex-1 py-2 rounded-lg font-semibold">Masuk</button>
+      <button onclick="closeLogin()" class="flex-1 py-2 rounded-lg border font-semibold text-slate-600">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDIT -->
+<div id="modalEdit" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-3 md:p-4">
+  <div class="card p-4 md:p-6 w-full max-w-3xl max-h-[90vh] overflow-auto fade-in">
+    <div class="flex items-center justify-between mb-4 border-b pb-3">
+      <h3 class="text-lg md:text-xl font-bold text-blue-900"><i class="fas fa-edit text-purple-600 mr-2"></i>Edit Data</h3>
+      <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-700 text-3xl leading-none">&times;</button>
+    </div>
+    <form id="formEdit" onsubmit="saveEdit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <input type="hidden" id="editId"/>
+      <div class="md:col-span-2"><h4 class="font-semibold text-blue-900 border-b pb-2 mb-2 text-sm"><i class="fas fa-child mr-2"></i>Data Siswa</h4></div>
+      <div><label class="block text-xs font-medium text-slate-600 mb-1">Nama Lengkap *</label><input id="editNama" required class="input-field"/></div>
+      <div><label class="block text-xs font-medium text-slate-600 mb-1">NISN</label><input id="editNisn" class="input-field"/></div>
+      <div><label class="block text-xs font-medium text-slate-600 mb-1">Jenis Kelamin</label>
+        <select id="editJk" class="input-field"><option value="L">Laki-laki</option><option value="P">Perempuan</option></select>
+      </div>
+      <div><label class="block text-xs font-medium text-slate-600 mb-1">Tempat Lahir</label><input id="editTempatLahir" class="input-field"/></div>
+      <div><label class="block text-xs font-medium text-slate-600 mb-1">Tanggal Lahir</label><input id="editTglLahir" type="date" class="input-field"/></div>
+      <div><label class="block text-xs font-medium text-slate-600 mb-1">NIK Siswa</label><input id="editNik" class="input-field"/></div>
+      <div><label class="block text-xs font-medium text-slate-600 mb-1">No. Kartu Keluarga</label><input id="editNoKK" class="input-field"/></div>
+      <div class="md:col-span-2"><label class="block text-xs font-medium text-slate-600 mb-1">Asal Sekolah</label><input id="editAsalSekolah" class="input-field"/></div>
+      <div><label class="block text-xs font-medium text-slate-600 mb-1">Agama</label>
+        <select id="editAgama" class="input-field"><option>Islam</option><option>Kristen</option><option>Katolik</option><option>Hindu</option><option>Buddha</option><option>Konghucu</option></select>
+      </div>
+      <div><label class="block text-xs font-medium text-slate-600 mb-1">Kode Pos</label><input id="editKodepos" class="input-field"/></div>
+      <div><label class="block text-xs font-medium text-slate-600 mb-1">Alamat</label><input id="editAlamat" class="input-field"/></div>
+      <div><label class="block text-xs font-medium text-slate-600 mb-1">RT/RW</label><input id="editRtrw" class="input-field"/></div>
+      <div><label class="block text-xs font-medium text-slate-600 mb-1">Desa</label><input id="editDesa" class="input-field"/></div>
+      <div><label class="block text-xs font-medium text-slate-600 mb-1">Kecamatan</label><input id="editKecamatan" class="input-field"/></div>
+      <div><label class="block text-xs font-medium text-slate-600 mb-1">Kabupaten</label><input id="editKabupaten" class="input-field"/></div>
+      <div><label class="block text-xs font-medium text-slate-600 mb-1">Provinsi</label><input id="editProvinsi" class="input-field"/></div>
+
+      <div class="md:col-span-2 mt-2"><h4 class="font-semibold text-blue-900 border-b pb-2 mb-2 text-sm"><i class="fas fa-users mr-2"></i>Data Orang Tua & Wali</h4></div>
+      <div><label class="block text-xs font-medium text-slate-600 mb-1">Nama Ayah</label><input id="editNamaAyah" class="input-field"/></div>
+      <div><label class="block text-xs font-medium text-slate-600 mb-1">Pekerjaan Ayah</label><input id="editKerjaAyah" class="input-field"/></div>
+      <div><label class="block text-xs font-medium text-slate-600 mb-1">Gaji Ayah</label><select id="editGajiAyah" class="input-field"><option value="">-- Pilih --</option></select></div>
+      <div><label class="block text-xs font-medium text-slate-600 mb-1">Nama Ibu</label><input id="editNamaIbu" class="input-field"/></div>
+      <div><label class="block text-xs font-medium text-slate-600 mb-1">Pekerjaan Ibu</label><input id="editKerjaIbu" class="input-field"/></div>
+      <div><label class="block text-xs font-medium text-slate-600 mb-1">Gaji Ibu</label><select id="editGajiIbu" class="input-field"><option value="">-- Pilih --</option></select></div>
+      <div><label class="block text-xs font-medium text-slate-600 mb-1">Nama Wali</label><input id="editWaliSiswa" class="input-field"/></div>
+      <div><label class="block text-xs font-medium text-slate-600 mb-1">Pekerjaan Wali</label><input id="editKerjaWali" class="input-field"/></div>
+      <div><label class="block text-xs font-medium text-slate-600 mb-1">Gaji Wali</label><select id="editGajiWali" class="input-field"><option value="">-- Pilih --</option></select></div>
+      <div><label class="block text-xs font-medium text-slate-600 mb-1">No. HP</label><input id="editHpOrtu" class="input-field"/></div>
+      <div class="md:col-span-2"><label class="block text-xs font-medium text-slate-600 mb-1">Email</label><input id="editEmail" type="email" class="input-field"/></div>
+
+      <div class="md:col-span-2 flex justify-end gap-3 mt-4 border-t pt-4">
+        <button type="button" onclick="closeEditModal()" class="px-4 md:px-6 py-2 rounded-lg border font-semibold text-slate-600 hover:bg-slate-50 text-sm">Batal</button>
+        <button type="submit" class="btn-edit px-4 md:px-6 py-2 rounded-lg font-semibold shadow-lg text-sm"><i class="fas fa-save mr-2"></i>Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL DETAIL -->
+<div id="modalDetail" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-3 md:p-4">
+  <div class="card p-4 md:p-6 w-full max-w-3xl max-h-[90vh] overflow-auto fade-in">
+    <div class="flex items-center justify-between mb-4 border-b pb-3">
+      <h3 class="text-lg md:text-xl font-bold text-blue-900"><i class="fas fa-user-graduate text-orange-500 mr-2"></i>Detail Data Siswa</h3>
+      <button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-700 text-3xl leading-none">&times;</button>
+    </div>
+    <div id="detailContent"></div>
+  </div>
+</div>
+
+<!-- MODAL FILES -->
+<div id="modalFiles" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-3 md:p-4">
+  <div class="card p-4 md:p-6 w-full max-w-4xl max-h-[90vh] overflow-auto fade-in">
+    <div class="flex items-center justify-between mb-4 border-b pb-3">
+      <h3 class="text-lg md:text-xl font-bold text-blue-900"><i class="fas fa-folder-open text-orange-500 mr-2"></i>Berkas: <span id="filesStudentName" class="text-orange-500"></span></h3>
+      <button onclick="closeFilesModal()" class="text-slate-400 hover:text-slate-700 text-3xl leading-none">&times;</button>
+    </div>
+    <div id="filesContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+  </div>
+</div>
+
+<!-- MODAL SUCCESS -->
+<div id="modalSuccess" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-[60] p-3 md:p-4">
+  <div class="card p-6 md:p-10 w-full max-w-lg text-center fade-in">
+    <div class="success-checkmark"><i class="fas fa-check text-white text-5xl"></i></div>
+    <h3 class="text-xl md:text-3xl font-bold text-blue-900 mt-6 success-text leading-tight px-4">
+      TERIMA KASIH<br>DATA ANDA SUDAH TERSIMPAN
+    </h3>
+    <p class="text-xs text-slate-500 mt-3"><i class="fas fa-table text-green-500 mr-1"></i>Tersinkronisasi ke Google Sheets</p>
+    <button onclick="closeSuccess()" class="btn-oranye px-6 md:px-8 py-3 rounded-lg font-semibold mt-6 md:mt-8 shadow-lg hover:shadow-xl transition inline-flex items-center gap-2">
+      <i class="fas fa-check-circle"></i>OK
+    </button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   ⚙️ KONFIGURASI URL — akan diisi otomatis saat download terkonfigurasi
+   ============================================================ */
+var DEFAULT_API_URL = '';
+var API_URL = DEFAULT_API_URL || localStorage.getItem('databaseSDNMT2027_apiUrl') || '';
+var apiUrlLocked = localStorage.getItem('databaseSDNMT2027_apiUrlLocked') === 'true' || (DEFAULT_API_URL !== '');
+var lastConnectionTest = null;
+
+/* ============================================================
+   DATA WILAYAH BOJONEGORO
+   ============================================================ */
+var WILAYAH = {
+  "Balen": ["Balen","Bulu","Kedungbondo","Kedungdowo","Lengkong","Margomulyo","Mayangkawis","Mulyoagung","Ngadiluhur","Pilangsari","Pohbogo","Prambatan","Sekaran","Sidobandung","Sobontoro","Suwaloh"],
+  "Baureno": ["Banjaran","Baureno","Blongsong","Bumiayu","Gajah","Gunungsari","Kaligede","Karangdayu","Kauman","Lebaksari","Ngemplak","Pasinan","Pomahan","Pucangarum","Selorejo","Sembunglor","Srbah","Tanggungan","Tlogoagung","Trojalu","Tulungagung"],
+  "Bojonegoro": ["Banjarejo","Campurejo","Jetak","Kadipaten","Karangpacar","Kepatihan","Kliteh","Ledok Kulon","Ledok Wetan","Mojokampung","Mulyoagung","Ngrowo","Pacul","Semanding","Sukorejo","Sumbang","Tambakromo"],
+  "Bubulan": ["Bubulan","Cancung","Clebung","Ngorogunung","Sumberbendo"],
+  "Dander": ["Dander","Growok","Jatiblimbing","Karangsono","Kunci","Mojoranu","Ngablak","Ngraseh","Ngulanan","Ngumpakdalem","Sendangrejo","Sumberagung","Sumberarum","Sumbertlaseh","Sumodikaran"],
+  "Gayam": ["Begadon","Beged","Boncong","Brabowan","Gayam","Gempol","Kaligede","Katur","Mojodelik","Ngraho","Ringintunggal","Sudu"],
+  "Gondang": ["Bumela","Gondang","Jari","Krondonan","Pajeng","Pragelan","Senganten"],
+  "Kalitidu": ["Brenggolo","Grebegan","Kalitidu","Mayanggeneng","Mayangrejo","Mlaten","Mojo","Mojosari","Ngiringinrejo","Pilangsari","Pungpungan","Sumengko","Talok","Wotanngare"],
+  "Kanor": ["Bakung","Bendo","Bungur","Cangaan","Gapuk","Gogor","Gondang","Kanor","Karangbendo","Nglarangan","Palembon","Pesen","Piyak","Prangi","Purwosari","Samberan","Sedeng","Simbatan","Sumberjo","Tambahrejo","Tanjung","Tlogohaji"],
+  "Kapas": ["Bakalan","Bangilan","Bendo","Dukuh","Kalirejo","Kapas","Kedaton","Kumpulrejo","Mulyoagung","Ngampel","Padangmentoyo","Plesungan","Sambiroto","Semenpinggir","Sukowati","Tanjungharjo","Tembeling","Wedi"],
+  "Kasiman": ["Batokan","Besah","Kasiman","Kedungasri","Nglateng","Ngaglik","Sambeng","Sekaran","Sidomukti","Tambakmerak","Tembeling"],
+  "Kedungadem": ["Babad","Balongcabe","Dayukidul","Drokilo","Duwel","Geger","Jamberejo","Kedungadem","Kedungrejo","Kendung","Kepohkidul","Megale","Mlideg","Mojorejo","Ngrandu","Panjang","Pejok","Sidomulyo","Sidorejo","Tlogoagung","Tondomulo"],
+  "Kepohbaru": ["Babad","Balongdowo","Bayemgede","Betet","Bumirejo","Cengkir","Jipo","Karangan","Kepoh","Kranggan","Mudung","Nglumber","Ngrowo","Pohwates","Simorejo","Sugihwaras","Sumberagung","Sumberoto","Tlogorejo","Turigede","Woro"],
+  "Malo": ["Banjarejo","Dukohlor","Kacangan","Kemiri","Ketileng","Klotok","Ngujung","Petak","Rendeng","Sukorejo","Sumberejo","Tambakromo","Tanggungan","Temu","Tlogorejo"],
+  "Margomulyo": ["Geneng","Kalangan","Margomulyo","Meduri","Ngelo","Sumberjo"],
+  "Ngambon": ["Bondol","Caruban","Karangmangu","Ngambon","Nglampin","Sengon"],
+  "Ngasem": ["Bandungrejo","Bareng","Butoh","Dukohkidul","Jampet","Jelu","Kolong","Mediyunan","Ngadiluwih","Ngasem","Ngantru","Sambong","Sendangharjo","Setren","Tengger","Trenggulunan","Wadang"],
+  "Ngraho": ["Bancer","Bangunrejo","Drenges","Jatimulyo","Kalirejo","Kalisumber","Luwihaji","Mojorejo","Ngraho","Nganti","Puledagel","Sidorejo","Soko","Sumberagung","Sumberarum","Tapelan"],
+  "Padangan": ["Banjarejo","Cendono","Dengok","Joyorejo","Kebonagung","Kuncen","Ngabab","Ngeper","Nguken","Padangan","Prigi","Purworejo","Sidorejo","Sonorejo","Sumberejo","Tebon"],
+  "Purwosari": ["Donan","Gapluk","Kaliyoso","Kuniran","Ngadipurwo","Ngambon","Pagerwesi","Pelem","Purwosari","Punggur","Sedahkidul","Sumberejo","Tlatah"],
+  "Sekar": ["Bareng","Bobol","Deling","Klino","Miyono","Sekar","Sumberjo"],
+  "Sugihwaras": ["Alasgung","Balenrejo","Bulaklo","Bungur","Genjor","Glagahan","Jatitengah","Kedungdowo","Kedungrejo","Nglajang","Panemon","Pandan","Papringan","Sugihwaras","Sumberjo","Trate","Wonocolo"],
+  "Sukosewu": ["Duyungan","Jumok","Kalicilik","Klepek","Pacing","Purwoasri","Semawot","Semenkidul","Sidodadi","Sidorejo","Sitiaji","Sukosewu","Sumberjokidul","Sumberjo","Tegalkodo"],
+  "Sumberejo": ["Banjarsari","Deru","Karangdinoyo","Kayulemah","Kedungrejo","Margoagung","Mlinjeng","Ngampal","Pejambon","Pekuwon","Prayungan","Sambongrejo","Sendangagung","Sumberejo","Sumberharjo","Sumuragung","Talun","Teleng","Tlogohaji","Wotan"],
+  "Tambakrejo": ["Bakalan","Dolokgede","Gading","Gamongan","Jatimulyo","Kalisalam","Kedungpenganten","Malingmati","Mulyorejo","Napis","Ngrancang","Pengkol","Pucangan","Sukorejo","Tambakrejo","Tanjung","Turirejo"],
+  "Temayang": ["Bakulan","Belun","Buntalan","Jono","Kedungsari","Ngujung","Pandantoyo","Papringan","Soko","Temayang"],
+  "Trucuk": ["Banjarsari","Guyangan","Kandangan","Kanten","Mori","Padang","Pagerwesi","Sranak","Sumbangtimun","Sumberejo","Trucuk","Tulungrejo"],
+  "Kedewan": ["Kawengan","Kedewan","Beji","Wonosari","Ngrawoh"]
+};
+
+var SCHOOL_LAT = -7.1782;
+var SCHOOL_LNG = 111.9053;
+var SCHOOL_NAME = 'SD Negeri Model Terpadu Bojonegoro';
+var SCHOOL_ADDRESS = 'Jl. Raya Sukowati No.00, Sukolilo, Sukowati, Kec. Kapas, Kabupaten Bojonegoro';
+
+var dataInden = [];
+var fileTemp = {};
+var isAdmin = false;
+var modeWilayahAktif = 'dalam';
+var mapPicker = null, homeMarker = null, schoolMarker = null, lineConnector = null;
+var pickedLat = null, pickedLng = null;
+var chartInden = null, chartGender = null;
+
+/* ============================================================
+   INISIALISASI
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', function(){
+  try {
+    /* 🎯 Paksa tampilan awal = Dashboard */
+    document.querySelectorAll('.page').forEach(function(p){
+      p.classList.add('hidden');
+      p.style.display = 'none';
+    });
+    var dashEl = document.getElementById('page-dashboard');
+    if(dashEl){
+      dashEl.classList.remove('hidden');
+      dashEl.style.display = 'block';
+    }
+
+    /* 🎯 Pastikan menu Pengaturan tersembunyi */
+    var mp = document.getElementById('menuPengaturan');
+    if(mp){
+      mp.classList.add('hidden');
+      mp.style.display = 'none';
+    }
+
+    /* Isi dropdown kecamatan */
+    var selKec = document.getElementById('selKec');
+    Object.keys(WILAYAH).sort().forEach(function(k){
+      selKec.innerHTML += '<option value="' + k + '">' + k + '</option>';
+    });
+
+    isiDropdownGaji();
+    initMap();
+    renderChart();
+    updateAdminControls();
+    loadDataLokal();
+    updatePengaturanUI();
+
+    if(API_URL){
+      loadFromSheets();
+    } else {
+      updateStatusOnline(false);
+      document.getElementById('koneksiStatusText').innerHTML = '<b>Belum terhubung</b> ke Google Spreadsheet. Login admin → buka menu <b>Pengaturan</b>.';
+      document.getElementById('infoKoneksi').className = 'card p-3 md:p-4 mb-4 md:mb-6 bg-amber-50 border-l-4 border-amber-600';
+    }
+
+    document.getElementById('modalSuccess').addEventListener('click', function(e){ if(e.target === this) closeSuccess(); });
+    document.getElementById('modalDetail').addEventListener('click', function(e){ if(e.target === this) closeDetailModal(); });
+    document.getElementById('modalEdit').addEventListener('click', function(e){ if(e.target === this) closeEditModal(); });
+  } catch(err){ console.error('Init error:', err); }
+});
+
+function loadDataLokal(){
+  try {
+    dataInden = JSON.parse(localStorage.getItem('databaseSDNMT2027') || '[]');
+    renderTabel();
+    renderChart();
+    var el = document.getElementById('infoTotalLocal');
+    if(el) el.textContent = dataInden.length;
+  } catch(e){ dataInden = []; }
+}
+
+/* ============================================================
+   STATUS & LOADING
+   ============================================================ */
+function updateStatusOnline(status){
+  var el = document.getElementById('statusOnline');
+  var txt = document.getElementById('statusText');
+  if(status === true){
+    el.className = 'status-online';
+    txt.textContent = 'Online';
+  } else if(status === 'loading'){
+    el.className = 'status-loading';
+    txt.textContent = 'Memuat...';
+  } else {
+    el.className = 'status-offline';
+    txt.textContent = 'Offline';
+  }
+}
+
+function showLoading(show, msg){
+  var el = document.getElementById('loadingOverlay');
+  if(show){
+    if(msg) document.getElementById('loadingText').textContent = msg;
+    el.classList.add('active');
+  } else { el.classList.remove('active'); }
+}
+
+/* ============================================================
+   GOOGLE SHEETS API
+   ============================================================ */
+function loadFromSheets(){
+  if(!API_URL){ updateStatusOnline(false); return; }
+  updateStatusOnline('loading');
+  showLoading(true, 'Memuat data dari Google Sheets...');
+  fetch(API_URL + '?action=getAll&t=' + Date.now())
+    .then(function(res){ return res.json(); })
+    .then(function(json){
+      showLoading(false);
+      if(json.success){
+        dataInden = json.data || [];
+        try { localStorage.setItem('databaseSDNMT2027', JSON.stringify(dataInden)); } catch(e){}
+        renderTabel();
+        renderChart();
+        updateStatusOnline(true);
+        document.getElementById('infoTotalLocal').textContent = dataInden.length;
+        document.getElementById('infoTotalCloud').textContent = dataInden.length;
+        document.getElementById('koneksiStatusText').innerHTML = '<b>Terhubung</b> ke Google Spreadsheet. Total: <b>' + dataInden.length + '</b> data.';
+        document.getElementById('infoKoneksi').className = 'card p-3 md:p-4 mb-4 md:mb-6 bg-green-50 border-l-4 border-green-600';
+      } else { throw new Error(json.error || 'Gagal load'); }
+    })
+    .catch(function(err){
+      showLoading(false);
+      console.error('Load error:', err);
+      updateStatusOnline(false);
+      document.getElementById('koneksiStatusText').innerHTML = '<b>Gagal terhubung.</b> Cek URL Apps Script di menu Pengaturan.';
+      document.getElementById('infoKoneksi').className = 'card p-3 md:p-4 mb-4 md:mb-6 bg-red-50 border-l-4 border-red-600';
+    });
+}
+
+function refreshData(){
+  if(!API_URL){ alert('Belum terhubung ke Google Sheets. Hubungi admin.'); return; }
+  showLoading(true, 'Memuat ulang data...');
+  fetch(API_URL + '?action=getAll&t=' + Date.now())
+    .then(function(res){ return res.json(); })
+    .then(function(json){
+      showLoading(false);
+      if(json.success){
+        dataInden = json.data || [];
+        try { localStorage.setItem('databaseSDNMT2027', JSON.stringify(dataInden)); } catch(e){}
+        renderTabel();
+        renderChart();
+        alert('Data berhasil di-refresh! Total: ' + dataInden.length);
+      }
+    })
+    .catch(function(err){
+      showLoading(false);
+      alert('Gagal refresh: ' + err.message);
+    });
+}
+
+function saveToSheets(data, callback){
+  if(!API_URL){
+    dataInden.push(data);
+    try { localStorage.setItem('databaseSDNMT2027', JSON.stringify(dataInden)); } catch(e){}
+    renderTabel();
+    renderChart();
+    if(callback) callback(new Error('Offline mode'));
+    return;
+  }
+  showLoading(true, 'Menyimpan ke Google Sheets...');
+  fetch(API_URL, {
+    method: 'POST',
+    body: JSON.stringify({ action: 'add', data: data })
+  })
+  .then(function(res){ return res.json(); })
+  .then(function(json){
+    showLoading(false);
+    if(json.success){ if(callback) callback(null); }
+    else throw new Error(json.error);
+  })
+  .catch(function(err){
+    showLoading(false);
+    console.error('Save error:', err);
+    dataInden.push(data);
+    try { localStorage.setItem('databaseSDNMT2027', JSON.stringify(dataInden)); } catch(e){}
+    renderTabel();
+    renderChart();
+    if(callback) callback(err);
+  });
+}
+
+function updateSheets(data, callback){
+  if(!API_URL){ if(callback) callback(new Error('Offline mode')); return; }
+  showLoading(true, 'Memperbarui data...');
+  fetch(API_URL, {
+    method: 'POST',
+    body: JSON.stringify({ action: 'update', data: data })
+  })
+  .then(function(res){ return res.json(); })
+  .then(function(json){
+    showLoading(false);
+    if(json.success){ if(callback) callback(null); }
+    else throw new Error(json.error);
+  })
+  .catch(function(err){
+    showLoading(false);
+    if(callback) callback(err);
+  });
+}
+
+function deleteFromSheets(id, callback){
+  if(!API_URL){ if(callback) callback(new Error('Offline mode')); return; }
+  showLoading(true, 'Menghapus data...');
+  fetch(API_URL, {
+    method: 'POST',
+    body: JSON.stringify({ action: 'delete', id: id })
+  })
+  .then(function(res){ return res.json(); })
+  .then(function(json){
+    showLoading(false);
+    if(json.success){ if(callback) callback(null); }
+    else throw new Error(json.error);
+  })
+  .catch(function(err){
+    showLoading(false);
+    if(callback) callback(err);
+  });
+}
+
+/* ============================================================
+   PENGATURAN
+   ============================================================ */
+function updatePengaturanUI(){
+  var infoUrl = document.getElementById('infoUrl');
+  var infoLocal = document.getElementById('infoTotalLocal');
+  if(infoUrl) infoUrl.textContent = API_URL || 'Belum diatur';
+  if(infoLocal) infoLocal.textContent = dataInden.length;
+
+  var inputUrl = document.getElementById('inputApiUrl');
+  var statusEl = document.getElementById('statusKoneksi');
+  var badgeLock = document.getElementById('badgeLocked');
+  var btnSimpan = document.getElementById('btnSimpan');
+  var btnUnlock = document.getElementById('btnUnlock');
+  var btnReset = document.getElementById('btnReset');
+
+  if(!inputUrl) return;
+  if(API_URL) inputUrl.value = API_URL;
+
+  if(apiUrlLocked){
+    inputUrl.disabled = true;
+    inputUrl.classList.add('bg-slate-100', 'cursor-not-allowed');
+    badgeLock.classList.remove('hidden');
+    btnSimpan.classList.add('hidden');
+    btnUnlock.classList.remove('hidden');
+    btnReset.classList.add('hidden');
+    statusEl.className = 'connection-status connected';
+    statusEl.querySelector('i').className = 'fas fa-lock text-2xl text-green-600';
+    document.getElementById('statusKoneksiText').textContent = 'URL Terkunci';
+    document.getElementById('statusKoneksiDetail').textContent = 'URL tersimpan permanen. Klik "Unlock" untuk mengubah.';
+  } else {
+    inputUrl.disabled = false;
+    inputUrl.classList.remove('bg-slate-100', 'cursor-not-allowed');
+    badgeLock.classList.add('hidden');
+    btnSimpan.classList.remove('hidden');
+    btnUnlock.classList.add('hidden');
+    btnReset.classList.remove('hidden');
+    if(API_URL){
+      statusEl.className = 'connection-status unknown';
+      statusEl.querySelector('i').className = 'fas fa-question-circle text-2xl text-amber-600';
+      document.getElementById('statusKoneksiText').textContent = 'URL Tersimpan (Belum Dikunci)';
+      document.getElementById('statusKoneksiDetail').textContent = 'Klik "Test Koneksi" lalu "Simpan & Kunci"';
+    } else {
+      statusEl.className = 'connection-status disconnected';
+      statusEl.querySelector('i').className = 'fas fa-times-circle text-2xl text-red-600';
+      document.getElementById('statusKoneksiText').textContent = 'Belum Ada URL';
+      document.getElementById('statusKoneksiDetail').textContent = 'Masukkan URL Apps Script';
+    }
+  }
+}
+
+function testKoneksi(){
+  var url = document.getElementById('inputApiUrl').value.trim();
+  if(!url){ alert('Masukkan URL terlebih dahulu!'); return; }
+  if(url.indexOf('script.google.com') === -1){ alert('URL tidak valid.'); return; }
+
+  var statusEl = document.getElementById('statusKoneksi');
+  statusEl.className = 'connection-status unknown';
+  document.getElementById('statusKoneksiText').textContent = 'Menguji...';
+  document.getElementById('statusKoneksiDetail').textContent = 'Menghubungi Apps Script...';
+  statusEl.querySelector('i').className = 'fas fa-spinner fa-spin text-2xl text-amber-600';
+
+  showLoading(true, 'Menguji koneksi...');
+  fetch(url + '?action=getAll&t=' + Date.now())
+    .then(function(res){ return res.json(); })
+    .then(function(json){
+      showLoading(false);
+      if(json.success){
+        lastConnectionTest = true;
+        statusEl.className = 'connection-status connected';
+        statusEl.querySelector('i').className = 'fas fa-check-circle text-2xl text-green-600';
+        document.getElementById('statusKoneksiText').textContent = 'Koneksi Berhasil!';
+        document.getElementById('statusKoneksiDetail').textContent = 'Total data di Sheets: ' + (json.data ? json.data.length : 0);
+        document.getElementById('infoTotalCloud').textContent = json.data ? json.data.length : 0;
+        alert('Koneksi berhasil!\nTotal data: ' + (json.data ? json.data.length : 0));
+      } else { throw new Error(json.error || 'Response tidak valid'); }
+    })
+    .catch(function(err){
+      showLoading(false);
+      lastConnectionTest = false;
+      statusEl.className = 'connection-status disconnected';
+      statusEl.querySelector('i').className = 'fas fa-times-circle text-2xl text-red-600';
+      document.getElementById('statusKoneksiText').textContent = 'Koneksi Gagal';
+      document.getElementById('statusKoneksiDetail').textContent = err.message;
+      alert('Koneksi gagal: ' + err.message);
+    });
+}
+
+function simpanPengaturan(){
+  var url = document.getElementById('inputApiUrl').value.trim();
+  if(!url){ alert('URL tidak boleh kosong!'); return; }
+  if(url.indexOf('script.google.com') === -1){ alert('URL tidak valid.'); return; }
+  if(url.indexOf('/exec') === -1){
+    if(!confirm('URL tidak berakhiran /exec. Yakin simpan?')) return;
+  }
+  if(!confirm('Setelah disimpan, URL akan TERKUNCI.\n\nAnda perlu klik "Unlock" untuk mengubah.\n\nLanjutkan?')) return;
+
+  localStorage.setItem('databaseSDNMT2027_apiUrl', url);
+  localStorage.setItem('databaseSDNMT2027_apiUrlLocked', 'true');
+  API_URL = url;
+  apiUrlLocked = true;
+
+  alert('✅ URL berhasil disimpan & TERKUNCI!\n\nUntuk distribusi ke device lain:\n1. Klik "Download File HTML Terkonfigurasi"\n2. Upload file ke hosting\n3. Semua device akan OTOMATIS terhubung');
+
+  updatePengaturanUI();
+  loadFromSheets();
+}
+
+function unlockApiUrl(){
+  if(!isAdmin){ alert('Hanya admin!'); return; }
+  if(!confirm('Unlock URL? Anda bisa mengubah/hapus URL setelah ini.')) return;
+  apiUrlLocked = false;
+  localStorage.setItem('databaseSDNMT2027_apiUrlLocked', 'false');
+  updatePengaturanUI();
+  alert('URL berhasil di-unlock.');
+}
+
+function resetPengaturan(){
+  if(!isAdmin){ alert('Hanya admin!'); return; }
+  if(!confirm('Reset URL? Aplikasi kembali ke mode offline.')) return;
+  localStorage.removeItem('databaseSDNMT2027_apiUrl');
+  localStorage.removeItem('databaseSDNMT2027_apiUrlLocked');
+  API_URL = '';
+  apiUrlLocked = false;
+  document.getElementById('inputApiUrl').value = '';
+  document.getElementById('infoUrl').textContent = 'Belum diatur';
+  document.getElementById('infoTotalCloud').textContent = '-';
+  updatePengaturanUI();
+  updateStatusOnline(false);
+  document.getElementById('koneksiStatusText').innerHTML = '<b>Belum terhubung</b> ke Google Spreadsheet.';
+  document.getElementById('infoKoneksi').className = 'card p-3 md:p-4 mb-4 md:mb-6 bg-amber-50 border-l-4 border-amber-600';
+  alert('URL berhasil di-reset.');
+}
+
+function downloadPreconfiguredHTML(){
+  if(!isAdmin){ alert('Hanya admin!'); return; }
+  if(!API_URL){ alert('URL belum diatur!'); return; }
+  showLoading(true, 'Menyiapkan file HTML...');
+  fetch(window.location.href, { cache: 'no-store' })
+    .then(function(res){ return res.text(); })
+    .then(function(html){ prosesDownloadHTML(html); })
+    .catch(function(err){
+      console.warn('Fetch gagal, pakai outerHTML:', err);
+      var html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      prosesDownloadHTML(html);
+    });
+}
+
+function prosesDownloadHTML(html){
+  var regex = /var\s+DEFAULT_API_URL\s*=\s*['"][^'"]*['"];/;
+  var newLine = "var DEFAULT_API_URL = '" + API_URL + "';";
+
+  if(!regex.test(html)){
+    showLoading(false);
+    alert('⚠️ Gagal menanamkan URL.\n\nLakukan manual:\n1. Buka file HTML dengan editor\n2. Cari: var DEFAULT_API_URL = \'\';\n3. Ganti dengan: ' + newLine);
+    return;
+  }
+
+  html = html.replace(regex, newLine);
+
+  var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'database-sdnmt-2027-terkonfigurasi.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  showLoading(false);
+  alert('✅ File HTML terkonfigurasi berhasil di-download!\n\nUpload ke hosting (Netlify/GitHub Pages) → semua device OTOMATIS terhubung.');
+}
+
+function showUrlForHardcode(){
+  if(!API_URL){ alert('URL belum diatur!'); return; }
+  var line = "var DEFAULT_API_URL = '" + API_URL + "';";
+  var ta = document.createElement('textarea');
+  ta.value = line;
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); } catch(e){}
+  document.body.removeChild(ta);
+  alert('✅ Baris kode sudah di-copy:\n\n' + line + '\n\nPaste ke file HTML menggantikan:\nvar DEFAULT_API_URL = \'\';');
+}
+
+/* ============================================================
+   APPS SCRIPT CODE
+   ============================================================ */
+var KODE_APPS_SCRIPT = [
+"/* GOOGLE APPS SCRIPT — API Database SDNMT 2027 */",
+"const SHEET_NAME = 'Inden';",
+"const FOLDER_NAME = 'SDNMT Files 2027';",
+"const HEADERS = [",
+"  'id', 'timestamp', 'nama', 'nisn', 'jk', 'tempatLahir', 'tglLahir', 'umur',",
+"  'nik', 'noKK', 'asalSekolah', 'agama', 'alamat', 'rtrw', 'kodepos',",
+"  'modeWilayah', 'kecamatan', 'desa', 'kabupaten', 'provinsi',",
+"  'namaAyah', 'kerjaAyah', 'gajiAyah', 'namaIbu', 'kerjaIbu', 'gajiIbu',",
+"  'waliSiswa', 'kerjaWali', 'gajiWali', 'hpOrtu', 'email',",
+"  'lat', 'lng', 'jarak', 'jarakNum',",
+"  'fileKK', 'fileKTP', 'fileAkta', 'fileFoto', 'tglDaftar'",
+"];",
+"function getSheet() {",
+"  const ss = SpreadsheetApp.getActiveSpreadsheet();",
+"  let sheet = ss.getSheetByName(SHEET_NAME);",
+"  if (!sheet) {",
+"    sheet = ss.insertSheet(SHEET_NAME);",
+"    sheet.appendRow(HEADERS);",
+"    sheet.getRange(1, 1, 1, HEADERS.length).setFontWeight('bold').setBackground('#1e3a8a').setFontColor('#ffffff');",
+"    sheet.setFrozenRows(1);",
+"  }",
+"  return sheet;",
+"}",
+"function getFolder() {",
+"  const folders = DriveApp.getFoldersByName(FOLDER_NAME);",
+"  if (folders.hasNext()) return folders.next();",
+"  return DriveApp.createFolder(FOLDER_NAME);",
+"}",
+"function doGet(e) { return handleRequest(e); }",
+"function doPost(e) { return handleRequest(e); }",
+"function handleRequest(e) {",
+"  try {",
+"    let params = {};",
+"    if (e.postData && e.postData.contents) {",
+"      try { params = JSON.parse(e.postData.contents); } catch (err) {}",
+"    }",
+"    if (e.parameter) { for (let k in e.parameter) params[k] = e.parameter[k]; }",
+"    const action = params.action || 'getAll';",
+"    let result;",
+"    switch (action) {",
+"      case 'getAll': result = { success: true, data: getAllData() }; break;",
+"      case 'add': result = { success: true, data: addData(params.data) }; break;",
+"      case 'update': result = { success: true, data: updateData(params.data) }; break;",
+"      case 'delete': result = { success: true, data: deleteData(params.id) }; break;",
+"      default: result = { success: false, error: 'Unknown action: ' + action };",
+"    }",
+"    return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);",
+"  } catch (err) {",
+"    return ContentService.createTextOutput(JSON.stringify({ success: false, error: err.toString() })).setMimeType(ContentService.MimeType.JSON);",
+"  }",
+"}",
+"function getAllData() {",
+"  const sheet = getSheet();",
+"  const lastRow = sheet.getLastRow();",
+"  if (lastRow < 2) return [];",
+"  const data = sheet.getRange(2, 1, lastRow - 1, HEADERS.length).getValues();",
+"  return data.map(function (row) {",
+"    const obj = {};",
+"    HEADERS.forEach(function (h, i) {",
+"      let val = row[i];",
+"      if (typeof val === 'string' && val.startsWith('{')) {",
+"        try { val = JSON.parse(val); } catch (e) {}",
+"      }",
+"      if ((h === 'id' || h === 'jarakNum' || h === 'lat' || h === 'lng') && val !== '' && val !== null) {",
+"        const n = Number(val);",
+"        if (!isNaN(n)) val = n;",
+"      }",
+"      obj[h] = val;",
+"    });",
+"    return obj;",
+"  }).filter(function (d) { return d.id; });",
+"}",
+"function addData(data) {",
+"  if (!data) throw new Error('Data kosong');",
+"  const sheet = getSheet();",
+"  data.timestamp = new Date();",
+"  ['fileKK', 'fileKTP', 'fileAkta', 'fileFoto'].forEach(function (field) {",
+"    if (data[field] && data[field].base64) {",
+"      data[field] = saveFileToDrive(data[field]);",
+"    }",
+"  });",
+"  const row = HEADERS.map(function (h) {",
+"    let v = data[h];",
+"    if (v === null || v === undefined) return '';",
+"    if (typeof v === 'object') return JSON.stringify(v);",
+"    return v;",
+"  });",
+"  sheet.appendRow(row);",
+"  return { id: data.id };",
+"}",
+"function updateData(data) {",
+"  if (!data || !data.id) throw new Error('Data tidak lengkap');",
+"  const sheet = getSheet();",
+"  const lastRow = sheet.getLastRow();",
+"  if (lastRow < 2) throw new Error('Data tidak ditemukan');",
+"  const ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues().flat();",
+"  const rowIndex = ids.findIndex(function (id) { return String(id) === String(data.id); });",
+"  if (rowIndex === -1) throw new Error('Data tidak ditemukan');",
+"  ['fileKK', 'fileKTP', 'fileAkta', 'fileFoto'].forEach(function (field) {",
+"    if (data[field] && data[field].base64) {",
+"      data[field] = saveFileToDrive(data[field]);",
+"    }",
+"  });",
+"  const row = HEADERS.map(function (h) {",
+"    let v = data[h];",
+"    if (v === null || v === undefined) return '';",
+"    if (typeof v === 'object') return JSON.stringify(v);",
+"    return v;",
+"  });",
+"  sheet.getRange(rowIndex + 2, 1, 1, row.length).setValues([row]);",
+"  return { id: data.id };",
+"}",
+"function deleteData(id) {",
+"  if (!id) throw new Error('ID kosong');",
+"  const sheet = getSheet();",
+"  const lastRow = sheet.getLastRow();",
+"  if (lastRow < 2) throw new Error('Data tidak ditemukan');",
+"  const ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues().flat();",
+"  const rowIndex = ids.findIndex(function (v) { return String(v) === String(id); });",
+"  if (rowIndex === -1) throw new Error('Data tidak ditemukan');",
+"  sheet.deleteRow(rowIndex + 2);",
+"  return { id: id };",
+"}",
+"function saveFileToDrive(fileData) {",
+"  const folder = getFolder();",
+"  const base64 = fileData.base64.indexOf(',') > -1 ? fileData.base64.split(',')[1] : fileData.base64;",
+"  const blob = Utilities.newBlob(Utilities.base64Decode(base64), fileData.mimeType || 'application/octet-stream', fileData.name || 'file');",
+"  const file = folder.createFile(blob);",
+"  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);",
+"  return {",
+"    id: file.getId(),",
+"    name: file.getName(),",
+"    url: 'https://drive.google.com/uc?export=view&id=' + file.getId(),",
+"    previewUrl: 'https://drive.google.com/file/d/' + file.getId() + '/preview',",
+"    mimeType: fileData.mimeType",
+"  };",
+"}"
+].join('\n');
+
+function toggleKodeAppsScript(){
+  var el = document.getElementById('kodeAppsScript');
+  el.classList.toggle('hidden');
+  if(!el.classList.contains('hidden')){
+    document.getElementById('textareaKode').value = KODE_APPS_SCRIPT;
+  }
+}
+
+function copyKodeAppsScript(){
+  var ta = document.getElementById('textareaKode');
+  ta.select();
+  try { document.execCommand('copy'); alert('Kode berhasil di-copy!'); } catch(e){ alert('Gagal copy.'); }
+}
+
+/* ============================================================
+   MAP
+   ============================================================ */
+function initMap(){
+  try {
+    mapPicker = L.map('mapPicker').setView([SCHOOL_LAT, SCHOOL_LNG], 14);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd', maxZoom: 19
+    }).addTo(mapPicker);
+    var schoolIcon = L.divIcon({
+      className: '',
+      html: '<div style="background:#f97316;color:#fff;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.35);font-size:15px;"><i class="fas fa-school"></i></div>',
+      iconSize: [36,36], iconAnchor: [18,18]
+    });
+    schoolMarker = L.marker([SCHOOL_LAT, SCHOOL_LNG], {icon: schoolIcon}).addTo(mapPicker)
+      .bindPopup('<b>' + SCHOOL_NAME + '</b><br><span style="color:#64748b;font-size:11px;">' + SCHOOL_ADDRESS + '</span>');
+    mapPicker.on('click', function(e){ setHomeLocation(e.latlng.lat, e.latlng.lng); });
+  } catch(e){ console.error('Map error:', e); }
+}
+
+var homeIcon = L.divIcon({
+  className: '',
+  html: '<div style="background:#1e3a8a;color:#fff;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.35);font-size:15px;"><i class="fas fa-home"></i></div>',
+  iconSize: [36,36], iconAnchor: [18,18]
+});
+
+function setHomeLocation(lat, lng){
+  pickedLat = lat; pickedLng = lng;
+  if(homeMarker) mapPicker.removeLayer(homeMarker);
+  if(lineConnector) mapPicker.removeLayer(lineConnector);
+  homeMarker = L.marker([lat, lng], {icon: homeIcon}).addTo(mapPicker).bindPopup('<b>Lokasi Rumah</b>').openPopup();
+  lineConnector = L.polyline([[lat, lng], [SCHOOL_LAT, SCHOOL_LNG]], { color: '#f97316', weight: 3, dashArray: '6 6' }).addTo(mapPicker);
+  var jarak = hitungJarak(lat, lng, SCHOOL_LAT, SCHOOL_LNG);
+  document.getElementById('displayLat').textContent = lat.toFixed(6);
+  document.getElementById('displayLng').textContent = lng.toFixed(6);
+  document.getElementById('displayJarak').textContent = jarak.toFixed(2) + ' km';
+  document.getElementById('hiddenLat').value = lat.toFixed(6);
+  document.getElementById('hiddenLng').value = lng.toFixed(6);
+  document.getElementById('hiddenJarak').value = jarak.toFixed(2) + ' km';
+  document.getElementById('hiddenJarakNum').value = jarak.toFixed(4);
+  mapPicker.fitBounds([[lat, lng], [SCHOOL_LAT, SCHOOL_LNG]], {padding: [40, 40]});
+}
+
+function deteksiLokasiSaya(){
+  if(!navigator.geolocation){ alert('Browser tidak mendukung geolokasi.'); return; }
+  navigator.geolocation.getCurrentPosition(
+    function(pos){ setHomeLocation(pos.coords.latitude, pos.coords.longitude); alert('Lokasi berhasil dideteksi!'); },
+    function(err){ alert('Gagal: ' + err.message); },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+}
+
+function resetLokasi(){
+  pickedLat = null; pickedLng = null;
+  if(mapPicker){
+    if(homeMarker){ mapPicker.removeLayer(homeMarker); homeMarker = null; }
+    if(lineConnector){ mapPicker.removeLayer(lineConnector); lineConnector = null; }
+    mapPicker.setView([SCHOOL_LAT, SCHOOL_LNG], 14);
+  }
+  document.getElementById('displayLat').textContent = '-';
+  document.getElementById('displayLng').textContent = '-';
+  document.getElementById('displayJarak').textContent = '-';
+  document.getElementById('hiddenLat').value = '';
+  document.getElementById('hiddenLng').value = '';
+  document.getElementById('hiddenJarak').value = '';
+  document.getElementById('hiddenJarakNum').value = '';
+}
+
+function hitungJarak(lat1, lon1, lat2, lon2){
+  var R = 6371;
+  var dLat = (lat2 - lat1) * Math.PI / 180;
+  var dLon = (lon2 - lon1) * Math.PI / 180;
+  var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+/* DROPDOWN GAJI */
+function isiDropdownGaji(){
+  var ids = ['gajiAyah','gajiIbu','gajiWali','editGajiAyah','editGajiIbu','editGajiWali'];
+  ids.forEach(function(id){
+    var sel = document.getElementById(id);
+    if(!sel) return;
+    var opt0 = document.createElement('option');
+    opt0.value = 'Tidak Berpenghasilan';
+    opt0.textContent = 'Tidak Berpenghasilan';
+    sel.appendChild(opt0);
+    var start = 1;
+    while(start < 50){
+      var end = start + 3;
+      if(end > 50) end = 50;
+      var opt = document.createElement('option');
+      opt.value = start + '-' + end + ' juta';
+      opt.textContent = 'Rp ' + start + ' juta - Rp ' + end + ' juta';
+      sel.appendChild(opt);
+      if(end === 50) break;
+      start = end;
+    }
+  });
+}
+
+/* DETEKSI USIA */
+function hitungUmur(){
+  var input = document.getElementById('inputTglLahir');
+  var box = document.getElementById('ageBox');
+  var tgl = input.value;
+  if(!tgl){ box.classList.add('hidden'); document.getElementById('umurHidden').value = ''; return; }
+  var tglLahir = new Date(tgl);
+  var hariIni = new Date();
+  hariIni.setHours(0,0,0,0);
+  if(tglLahir > hariIni){
+    box.classList.remove('hidden');
+    document.getElementById('ageTahun').textContent = '0';
+    document.getElementById('ageBulan').textContent = '0';
+    document.getElementById('ageHari').textContent = '0';
+    document.getElementById('ageText').textContent = 'Tanggal lahir tidak boleh melebihi hari ini';
+    document.getElementById('umurHidden').value = '';
+    return;
+  }
+  var tahun = hariIni.getFullYear() - tglLahir.getFullYear();
+  var bulan = hariIni.getMonth() - tglLahir.getMonth();
+  var hari  = hariIni.getDate() - tglLahir.getDate();
+  if(hari < 0){ bulan--; var bl = new Date(hariIni.getFullYear(), hariIni.getMonth(), 0); hari += bl.getDate(); }
+  if(bulan < 0){ tahun--; bulan += 12; }
+  var totalHari = Math.floor((hariIni - tglLahir) / (1000 * 60 * 60 * 24));
+  var totalBulan = (tahun * 12) + bulan;
+  box.classList.remove('hidden');
+  document.getElementById('ageTahun').textContent = tahun;
+  document.getElementById('ageBulan').textContent = bulan;
+  document.getElementById('ageHari').textContent  = hari;
+  document.getElementById('ageText').textContent = 'Total: ' + totalBulan + ' bulan (' + totalHari.toLocaleString('id-ID') + ' hari)';
+  document.getElementById('ageRefDate').textContent = 'Per: ' + hariIni.toLocaleDateString('id-ID', {day:'numeric',month:'short',year:'numeric'});
+  document.getElementById('umurHidden').value = tahun + ' tahun, ' + bulan + ' bulan, ' + hari + ' hari';
+}
+
+/* WILAYAH */
+function setWilayah(mode){
+  modeWilayahAktif = mode;
+  document.getElementById('modeWilayah').value = mode;
+  var optDalam = document.getElementById('optDalam');
+  var optLuar  = document.getElementById('optLuar');
+  var divDalam = document.getElementById('wilayahDalam');
+  var divLuar  = document.getElementById('wilayahLuar');
+  var selKec  = document.getElementById('selKec');
+  var selDesa = document.getElementById('selDesa');
+  var inDesaLuar = document.querySelector('[name="desaLuar"]');
+  var inKecLuar  = document.querySelector('[name="kecamatanLuar"]');
+  var inKabLuar  = document.querySelector('[name="kabupatenLuar"]');
+  if(mode === 'dalam'){
+    optDalam.classList.add('active'); optLuar.classList.remove('active');
+    divDalam.classList.remove('hidden'); divLuar.classList.add('hidden');
+    selKec.required = true; selDesa.required = true;
+    inDesaLuar.required = false; inKecLuar.required = false; inKabLuar.required = false;
+    inDesaLuar.value = ''; inKecLuar.value = ''; inKabLuar.value = '';
+    document.querySelector('[name="provinsiLuar"]').value = '';
+  } else {
+    optDalam.classList.remove('active'); optLuar.classList.add('active');
+    divDalam.classList.add('hidden'); divLuar.classList.remove('hidden');
+    selKec.required = false; selDesa.required = false;
+    inDesaLuar.required = true; inKecLuar.required = true; inKabLuar.required = true;
+    selKec.value = ''; selDesa.innerHTML = '<option value="">-- Pilih Desa --</option>';
+  }
+}
+
+function toggleSidebar(){
+  var sb = document.getElementById('sidebar');
+  var icon = document.getElementById('sidebarIcon');
+  sb.classList.toggle('w-64');
+  sb.classList.toggle('w-16');
+  document.querySelectorAll('.menu-text').forEach(function(el){ el.classList.toggle('hidden'); });
+  icon.classList.toggle('fa-chevron-left');
+  icon.classList.toggle('fa-chevron-right');
+}
+
+function showPage(name){
+  if(name === 'pengaturan' && !isAdmin){
+    alert('Halaman Pengaturan hanya bisa diakses oleh Admin.\nSilakan login terlebih dahulu.');
+    return;
+  }
+
+  /* Sembunyikan semua halaman */
+  document.querySelectorAll('.page').forEach(function(p){
+    p.classList.add('hidden');
+    p.style.display = 'none';
+  });
+
+  /* Tampilkan halaman yang dipilih */
+  var target = document.getElementById('page-' + name);
+  if(target){
+    target.classList.remove('hidden');
+    target.style.display = 'block';
+  }
+
+  if(name === 'dashboard') renderChart();
+  if(name === 'daftar') renderTabel();
+  if(name === 'inden' && mapPicker) setTimeout(function(){ mapPicker.invalidateSize(); }, 200);
+  if(name === 'pengaturan') updatePengaturanUI();
+}
+
+function isiDesa(){
+  var kec = document.getElementById('selKec').value;
+  var selDesa = document.getElementById('selDesa');
+  selDesa.innerHTML = '<option value="">-- Pilih Desa --</option>';
+  if(kec && WILAYAH[kec]){
+    WILAYAH[kec].sort().forEach(function(d){ selDesa.innerHTML += '<option value="' + d + '">' + d + '</option>'; });
+  }
+}
+
+/* VALIDASI FILE */
+function validasiFile(input, key, tipe){
+  var file = input.files[0];
+  if(!file) return;
+  if(tipe === 'pdf'){
+    if(file.type !== 'application/pdf'){ alert('File harus PDF!'); input.value=''; return; }
+  } else if(tipe === 'jpeg'){
+    if(file.type !== 'image/jpeg' && file.type !== 'image/jpg'){ alert('File harus JPEG/JPG!'); input.value=''; return; }
+  }
+  if(file.size > 2 * 1024 * 1024){ alert('Ukuran maksimal 2MB!'); input.value=''; return; }
+  var blobUrl = URL.createObjectURL(file);
+  var box = document.getElementById('preview-' + key);
+  box.classList.remove('hidden');
+  box.innerHTML = '<p class="text-xs text-slate-400 italic py-4 text-center"><i class="fas fa-spinner fa-spin mr-1"></i>Memproses...</p>';
+  var reader = new FileReader();
+  reader.onload = function(e){
+    fileTemp[key] = { base64: e.target.result, name: file.name, mimeType: file.type };
+    if(tipe === 'jpeg'){
+      box.innerHTML = '<img src="' + blobUrl + '" class="w-full max-h-48 object-contain rounded border bg-white"/>' +
+        '<p class="text-xs text-green-600 mt-2 text-center"><i class="fas fa-check-circle mr-1"></i>Siap diunggah</p>' +
+        '<div class="flex gap-2 mt-2 justify-center"><a href="' + blobUrl + '" target="_blank" class="text-blue-600 text-xs underline"><i class="fas fa-eye mr-1"></i>Pratinjau</a></div>';
+    } else {
+      box.innerHTML = '<embed src="' + blobUrl + '" type="application/pdf" width="100%" height="160px" />' +
+        '<p class="text-xs text-green-600 mt-2 text-center"><i class="fas fa-check-circle mr-1"></i>Siap diunggah</p>' +
+        '<div class="flex gap-2 mt-2 justify-center"><a href="' + blobUrl + '" target="_blank" class="text-blue-600 text-xs underline"><i class="fas fa-eye mr-1"></i>Pratinjau</a></div>';
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+/* SIMPAN */
+function simpanInden(e){
+  e.preventDefault();
+  var f = e.target;
+  var requiredFiles = ['fileKK','fileKTP','fileAkta','fileFoto'];
+  for(var i = 0; i < requiredFiles.length; i++){
+    if(!fileTemp[requiredFiles[i]]){
+      alert('Berkas ' + requiredFiles[i].replace('file','') + ' wajib diunggah!');
+      return;
+    }
+  }
+  if(!pickedLat || !pickedLng){
+    if(!confirm('Lokasi rumah belum ditandai di peta. Lanjutkan simpan?')) return;
+  }
+  var desa, kecamatan, kabupaten, provinsi, modeWilayah;
+  if(modeWilayahAktif === 'dalam'){
+    desa = f.desa.value; kecamatan = f.kecamatan.value; kabupaten = 'Bojonegoro'; provinsi = 'Jawa Timur';
+    modeWilayah = 'Dalam Kab. Bojonegoro';
+  } else {
+    desa = f.desaLuar.value; kecamatan = f.kecamatanLuar.value; kabupaten = f.kabupatenLuar.value;
+    provinsi = f.provinsiLuar.value || '-'; modeWilayah = 'Luar Kab. Bojonegoro';
+  }
+  var jarakNum = f.jarakNum.value ? parseFloat(f.jarakNum.value) : 99999;
+
+  var data = {
+    id: Date.now(),
+    nama: f.nama.value, nisn: f.nisn.value, jk: f.jk.value,
+    tempatLahir: f.tempatLahir.value, tglLahir: f.tglLahir.value,
+    umur: f.umurSiswa.value || '-',
+    nik: f.nik.value, noKK: f.noKK.value, asalSekolah: f.asalSekolah.value,
+    agama: f.agama.value, alamat: f.alamat.value,
+    rtrw: f.rtrw.value, kodepos: f.kodepos.value,
+    modeWilayah: modeWilayah,
+    kecamatan: kecamatan, desa: desa, kabupaten: kabupaten, provinsi: provinsi,
+    namaAyah: f.namaAyah.value, kerjaAyah: f.kerjaAyah.value, gajiAyah: f.gajiAyah.value || '-',
+    namaIbu: f.namaIbu.value, kerjaIbu: f.kerjaIbu.value, gajiIbu: f.gajiIbu.value || '-',
+    waliSiswa: f.waliSiswa.value || '-', kerjaWali: f.kerjaWali.value || '-', gajiWali: f.gajiWali.value || '-',
+    hpOrtu: f.hpOrtu.value, email: f.email.value || '-',
+    lat: pickedLat, lng: pickedLng,
+    jarak: f.jarakRumah.value || '-', jarakNum: jarakNum,
+    fileKK: fileTemp.fileKK, fileKTP: fileTemp.fileKTP, fileAkta: fileTemp.fileAkta, fileFoto: fileTemp.fileFoto,
+    tglDaftar: new Date().toLocaleString('id-ID')
+  };
+
+  saveToSheets(data, function(err){
+    if(err) console.warn('Data disimpan lokal, gagal sync cloud.');
+  });
+
+  fileTemp = {};
+  f.reset();
+  document.querySelectorAll('.preview-box').forEach(function(b){ b.classList.add('hidden'); b.innerHTML = ''; });
+  document.getElementById('ageBox').classList.add('hidden');
+  setWilayah('dalam');
+  resetLokasi();
+  showSuccess();
+}
+
+function showSuccess(){ var m = document.getElementById('modalSuccess'); m.classList.remove('hidden'); m.classList.add('flex'); }
+function closeSuccess(){ var m = document.getElementById('modalSuccess'); m.classList.add('hidden'); m.classList.remove('flex'); }
+
+/* EDIT */
+function openEditModal(index){
+  if(!isAdmin){ alert('Hanya admin!'); return; }
+  var d = dataInden[index];
+  if(!d) return;
+  document.getElementById('editId').value = d.id;
+  document.getElementById('editNama').value = d.nama || '';
+  document.getElementById('editNisn').value = d.nisn || '';
+  document.getElementById('editJk').value = d.jk || 'L';
+  document.getElementById('editTempatLahir').value = d.tempatLahir || '';
+  document.getElementById('editTglLahir').value = d.tglLahir || '';
+  document.getElementById('editNik').value = d.nik || '';
+  document.getElementById('editNoKK').value = d.noKK || '';
+  document.getElementById('editAsalSekolah').value = d.asalSekolah || '';
+  document.getElementById('editAgama').value = d.agama || 'Islam';
+  document.getElementById('editKodepos').value = d.kodepos || '';
+  document.getElementById('editAlamat').value = d.alamat || '';
+  document.getElementById('editRtrw').value = d.rtrw || '';
+  document.getElementById('editDesa').value = d.desa || '';
+  document.getElementById('editKecamatan').value = d.kecamatan || '';
+  document.getElementById('editKabupaten').value = d.kabupaten || '';
+  document.getElementById('editProvinsi').value = d.provinsi || '';
+  document.getElementById('editNamaAyah').value = d.namaAyah || '';
+  document.getElementById('editKerjaAyah').value = d.kerjaAyah || '';
+  document.getElementById('editGajiAyah').value = d.gajiAyah || '';
+  document.getElementById('editNamaIbu').value = d.namaIbu || '';
+  document.getElementById('editKerjaIbu').value = d.kerjaIbu || '';
+  document.getElementById('editGajiIbu').value = d.gajiIbu || '';
+  document.getElementById('editWaliSiswa').value = d.waliSiswa || '';
+  document.getElementById('editKerjaWali').value = d.kerjaWali || '';
+  document.getElementById('editGajiWali').value = d.gajiWali || '';
+  document.getElementById('editHpOrtu').value = d.hpOrtu || '';
+  document.getElementById('editEmail').value = d.email || '';
+  var m = document.getElementById('modalEdit');
+  m.classList.remove('hidden');
+  m.classList.add('flex');
+}
+
+function closeEditModal(){
+  var m = document.getElementById('modalEdit');
+  m.classList.add('hidden');
+  m.classList.remove('flex');
+}
+
+function saveEdit(e){
+  e.preventDefault();
+  if(!isAdmin){ alert('Hanya admin!'); return; }
+  var id = Number(document.getElementById('editId').value);
+  var idx = dataInden.findIndex(function(d){ return d.id === id; });
+  if(idx === -1){ alert('Data tidak ditemukan!'); return; }
+  var oldData = dataInden[idx];
+  var updated = {};
+  for(var k in oldData){ if(oldData.hasOwnProperty(k)) updated[k] = oldData[k]; }
+
+  updated.nama = document.getElementById('editNama').value;
+  updated.nisn = document.getElementById('editNisn').value;
+  updated.jk = document.getElementById('editJk').value;
+  updated.tempatLahir = document.getElementById('editTempatLahir').value;
+  updated.tglLahir = document.getElementById('editTglLahir').value;
+  updated.nik = document.getElementById('editNik').value;
+  updated.noKK = document.getElementById('editNoKK').value;
+  updated.asalSekolah = document.getElementById('editAsalSekolah').value;
+  updated.agama = document.getElementById('editAgama').value;
+  updated.kodepos = document.getElementById('editKodepos').value;
+  updated.alamat = document.getElementById('editAlamat').value;
+  updated.rtrw = document.getElementById('editRtrw').value;
+  updated.desa = document.getElementById('editDesa').value;
+  updated.kecamatan = document.getElementById('editKecamatan').value;
+  updated.kabupaten = document.getElementById('editKabupaten').value;
+  updated.provinsi = document.getElementById('editProvinsi').value;
+  updated.namaAyah = document.getElementById('editNamaAyah').value;
+  updated.kerjaAyah = document.getElementById('editKerjaAyah').value;
+  updated.gajiAyah = document.getElementById('editGajiAyah').value || '-';
+  updated.namaIbu = document.getElementById('editNamaIbu').value;
+  updated.kerjaIbu = document.getElementById('editKerjaIbu').value;
+  updated.gajiIbu = document.getElementById('editGajiIbu').value || '-';
+  updated.waliSiswa = document.getElementById('editWaliSiswa').value || '-';
+  updated.kerjaWali = document.getElementById('editKerjaWali').value || '-';
+  updated.gajiWali = document.getElementById('editGajiWali').value || '-';
+  updated.hpOrtu = document.getElementById('editHpOrtu').value;
+  updated.email = document.getElementById('editEmail').value || '-';
+  updated.modeWilayah = (updated.kabupaten || '').toLowerCase().indexOf('bojonegoro') > -1 ? 'Dalam Kab. Bojonegoro' : 'Luar Kab. Bojonegoro';
+
+  if(updated.tglLahir){
+    var tglLahir = new Date(updated.tglLahir);
+    var hariIni = new Date();
+    hariIni.setHours(0,0,0,0);
+    if(tglLahir <= hariIni){
+      var tahun = hariIni.getFullYear() - tglLahir.getFullYear();
+      var bulan = hariIni.getMonth() - tglLahir.getMonth();
+      var hari  = hariIni.getDate() - tglLahir.getDate();
+      if(hari < 0){ bulan--; var bl = new Date(hariIni.getFullYear(), hariIni.getMonth(), 0); hari += bl.getDate(); }
+      if(bulan < 0){ tahun--; bulan += 12; }
+      updated.umur = tahun + ' tahun, ' + bulan + ' bulan, ' + hari + ' hari';
+    }
+  }
+
+  updateSheets(updated, function(err){
+    if(err) alert('Gagal update.');
+    else alert('Perubahan berhasil disimpan!');
+  });
+  closeEditModal();
+}
+
+/* DETAIL */
+function showDetailModal(index){
+  if(!isAdmin){ alert('Hanya admin!'); return; }
+  var d = dataInden[index];
+  if(!d) return;
+  var alamatLengkap = (d.alamat || '-') + ' RT/RW ' + (d.rtrw || '-') + ', Desa ' + (d.desa || '-') + ', Kec. ' + (d.kecamatan || '-') + ', Kab. ' + (d.kabupaten || '-');
+  var row = function(label, value){
+    return '<div class="flex flex-col"><span class="detail-label">' + label + '</span><span class="detail-value">' + (value || '-') + '</span></div>';
+  };
+  document.getElementById('detailContent').innerHTML =
+    '<div class="bg-gradient-to-r from-blue-900 to-blue-700 text-white p-4 rounded-lg mb-4">' +
+      '<p class="text-xs opacity-80">No. Inden: ' + d.id + '</p>' +
+      '<p class="text-lg md:text-xl font-bold">' + d.nama + '</p>' +
+      '<p class="text-sm opacity-90">Didaftarkan: ' + d.tglDaftar + '</p>' +
+      (d.jarak && d.jarak !== '-' ? '<p class="text-sm mt-1"><i class="fas fa-route mr-1"></i>Jarak: <b>' + d.jarak + '</b></p>' : '') +
+    '</div>' +
+    '<h4 class="font-bold text-blue-900 border-b pb-2 mb-3"><i class="fas fa-child mr-2"></i>Data Siswa</h4>' +
+    '<div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-5">' +
+      row('Nama Lengkap', d.nama) + row('NISN', d.nisn) +
+      row('Jenis Kelamin', d.jk === 'L' ? 'Laki-laki' : 'Perempuan') +
+      row('Tempat Lahir', d.tempatLahir) + row('Tanggal Lahir', d.tglLahir) +
+      row('Usia', d.umur) + row('NIK Siswa', d.nik) + row('No. Kartu Keluarga', d.noKK) + row('Agama', d.agama) +
+      row('Asal Sekolah', d.asalSekolah) + row('Kode Pos', d.kodepos) +
+      '<div class="md:col-span-2">' + row('Alamat Lengkap', alamatLengkap) + '</div>' +
+      '<div class="md:col-span-2">' + row('Wilayah', d.modeWilayah) + '</div>' +
+      row('Jarak ke Sekolah', d.jarak) +
+    '</div>' +
+    '<h4 class="font-bold text-blue-900 border-b pb-2 mb-3"><i class="fas fa-users mr-2"></i>Data Orang Tua & Wali</h4>' +
+    '<div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-5">' +
+      row('Nama Ayah', d.namaAyah) + row('Pekerjaan Ayah', d.kerjaAyah) + row('Gaji Ayah', d.gajiAyah) +
+      row('Nama Ibu', d.namaIbu) + row('Pekerjaan Ibu', d.kerjaIbu) + row('Gaji Ibu', d.gajiIbu) +
+      row('Nama Wali', d.waliSiswa) + row('Pekerjaan Wali', d.kerjaWali) + row('Gaji Wali', d.gajiWali) +
+      row('No. HP', d.hpOrtu) + '<div class="md:col-span-2">' + row('Email', d.email) + '</div>' +
+    '</div>' +
+    '<div class="flex flex-wrap gap-2 justify-end border-t pt-3">' +
+      '<button onclick="closeDetailModal(); showFilesModal(' + index + ')" class="btn-biru px-4 py-2 rounded-lg text-sm font-semibold"><i class="fas fa-folder-open mr-1"></i>Berkas</button>' +
+      '<button onclick="closeDetailModal(); openEditModal(' + index + ')" class="btn-edit px-4 py-2 rounded-lg text-sm font-semibold"><i class="fas fa-edit mr-1"></i>Edit</button>' +
+      '<button onclick="downloadStudentPDF(' + index + ')" class="btn-oranye px-4 py-2 rounded-lg text-sm font-semibold"><i class="fas fa-file-pdf mr-1"></i>PDF</button>' +
+    '</div>';
+  var m = document.getElementById('modalDetail');
+  m.classList.remove('hidden');
+  m.classList.add('flex');
+}
+
+function closeDetailModal(){
+  var m = document.getElementById('modalDetail');
+  m.classList.add('hidden');
+  m.classList.remove('flex');
+}
+
+function showFilesModal(index){
+  if(!isAdmin){ alert('Hanya admin!'); return; }
+  var d = dataInden[index];
+  if(!d) return;
+  document.getElementById('filesStudentName').textContent = d.nama || '-';
+  var container = document.getElementById('filesContainer');
+  container.innerHTML = '';
+  var labels = {
+    fileKK:   { name: 'Kartu Keluarga (KK)', icon: 'fa-id-card', color: 'text-orange-500' },
+    fileKTP:  { name: 'KTP Orang Tua', icon: 'fa-id-card-alt', color: 'text-blue-500' },
+    fileAkta: { name: 'Akta Kelahiran', icon: 'fa-baby', color: 'text-green-500' },
+    fileFoto: { name: 'Foto 3x4 Berwarna', icon: 'fa-camera', color: 'text-pink-500' }
+  };
+  Object.keys(labels).forEach(function(key){
+    var meta = labels[key];
+    var f = d[key];
+    var card = document.createElement('div');
+    card.className = 'border border-slate-200 rounded-lg p-3 bg-slate-50';
+    if(f && f.url){
+      var isImage = f.mimeType && f.mimeType.indexOf('image') > -1;
+      var embedHTML = isImage
+        ? '<img src="' + f.url + '" class="w-full max-h-52 object-contain rounded border bg-white"/>'
+        : '<iframe src="' + f.previewUrl + '" class="w-full h-64 rounded border bg-white" frameborder="0"></iframe>';
+      card.innerHTML =
+        '<p class="font-semibold text-sm text-slate-700 mb-2 flex items-center justify-between">' +
+          '<span><i class="fas ' + meta.icon + ' ' + meta.color + ' mr-1"></i>' + meta.name + '</span>' +
+          '<span class="text-xs text-green-600"><i class="fas fa-cloud mr-1"></i>Drive</span>' +
+        '</p>' +
+        '<div class="bg-white rounded border">' + embedHTML + '</div>' +
+        '<div class="flex gap-3 mt-2">' +
+          '<a href="' + f.previewUrl + '" target="_blank" class="text-blue-600 text-xs underline font-semibold"><i class="fas fa-eye mr-1"></i>Buka</a>' +
+          '<a href="' + f.url + '" target="_blank" class="text-orange-500 text-xs underline font-semibold"><i class="fas fa-download mr-1"></i>Unduh</a>' +
+        '</div>';
+    } else {
+      card.innerHTML =
+        '<p class="font-semibold text-sm text-slate-700 mb-2"><i class="fas ' + meta.icon + ' ' + meta.color + ' mr-1"></i>' + meta.name + '</p>' +
+        '<p class="text-xs text-slate-400 italic py-8 text-center"><i class="fas fa-exclamation-circle mr-1"></i>Berkas tidak tersedia</p>';
+    }
+    container.appendChild(card);
+  });
+  var m = document.getElementById('modalFiles');
+  m.classList.remove('hidden');
+  m.classList.add('flex');
+}
+
+function closeFilesModal(){
+  var m = document.getElementById('modalFiles');
+  m.classList.add('hidden');
+  m.classList.remove('flex');
+}
+
+/* RENDER TABEL */
+function renderTabel(){
+  var tbody = document.getElementById('tbodyInden');
+  var empty = document.getElementById('emptyMsg');
+  tbody.innerHTML = '';
+  if(dataInden.length === 0){ empty.classList.remove('hidden'); return; }
+  empty.classList.add('hidden');
+  var sorted = dataInden.slice().sort(function(a, b){ return (a.jarakNum || 99999) - (b.jarakNum || 99999); });
+  sorted.forEach(function(d, i){
+    var badge = d.modeWilayah === 'Luar Kab. Bojonegoro'
+      ? '<span class="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">Luar</span>'
+      : '<span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">Dalam</span>';
+    var wilayahTxt = (d.desa || '-') + ', Kec. ' + (d.kecamatan || '-');
+    var jarakHTML = '<span class="text-xs text-slate-400 italic">-</span>';
+    if(d.jarak && d.jarak !== '-'){
+      var cls = 'jarak-badge';
+      if(d.jarakNum < 3) cls += ' close';
+      else if(d.jarakNum > 10) cls += ' far';
+      jarakHTML = '<span class="' + cls + '"><i class="fas fa-route mr-1"></i>' + d.jarak + '</span>';
+    }
+    var realIndex = dataInden.findIndex(function(x){ return x.id === d.id; });
+    var actionsHTML = isAdmin
+      ? '<button onclick="showDetailModal(' + realIndex + ')" class="text-purple-600 mr-2 hover:scale-110 transition" title="Detail"><i class="fas fa-eye"></i></button>' +
+        '<button onclick="showFilesModal(' + realIndex + ')" class="text-orange-600 mr-2 hover:scale-110 transition" title="Berkas"><i class="fas fa-folder-open"></i></button>' +
+        '<button onclick="openEditModal(' + realIndex + ')" class="text-violet-600 mr-2 hover:scale-110 transition" title="Edit"><i class="fas fa-edit"></i></button>' +
+        '<button onclick="downloadStudentPDF(' + realIndex + ')" class="text-blue-600 mr-2 hover:scale-110 transition" title="PDF"><i class="fas fa-file-pdf"></i></button>' +
+        '<button onclick="hapusInden(' + d.id + ')" class="text-red-500 hover:scale-110 transition" title="Hapus"><i class="fas fa-trash"></i></button>'
+      : '<span class="text-xs text-slate-400 italic"><i class="fas fa-lock mr-1"></i>Admin</span>';
+    tbody.innerHTML +=
+      '<tr class="table-row border-b">' +
+        '<td class="p-2 md:p-3">' + (i+1) + '</td>' +
+        '<td class="p-2 md:p-3 font-medium">' + (d.nama || '-') + '</td>' +
+        '<td class="p-2 md:p-3 text-center">' + (d.jk || '-') + '</td>' +
+        '<td class="p-2 md:p-3"><span class="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-full whitespace-nowrap"><i class="fas fa-cake-candles mr-1"></i>' + (d.umur || '-') + '</span></td>' +
+        '<td class="p-2 md:p-3">' + (d.asalSekolah || '-') + '</td>' +
+        '<td class="p-2 md:p-3"><span class="text-xs bg-purple-50 text-purple-700 px-2 py-1 rounded-full whitespace-nowrap"><i class="fas fa-user-shield mr-1"></i>' + (d.waliSiswa || '-') + '</span></td>' +
+        '<td class="p-2 md:p-3 text-center">' + jarakHTML + '</td>' +
+        '<td class="p-2 md:p-3"><div class="flex flex-col gap-1">' + badge + '<span class="text-xs text-slate-500">' + wilayahTxt + '</span></div></td>' +
+        '<td class="p-2 md:p-3 text-center whitespace-nowrap">' + actionsHTML + '</td>' +
+      '</tr>';
+  });
+}
+
+function hapusInden(id){
+  if(!isAdmin){ alert('Hanya admin!'); return; }
+  if(!confirm('Yakin hapus data ini?')) return;
+  deleteFromSheets(id, function(err){
+    if(err) alert('Gagal hapus.');
+    else alert('Data berhasil dihapus.');
+  });
+}
+
+/* PDF & EXCEL */
+function downloadStudentPDF(index){
+  if(!isAdmin){ alert('Hanya admin!'); return; }
+  var d = dataInden[index];
+  if(!d) return;
+  var jsPDF = window.jspdf.jsPDF;
+  var doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  doc.setFillColor(30, 58, 138); doc.rect(0, 0, 210, 32, 'F');
+  doc.setTextColor(255, 255, 255); doc.setFont('helvetica','bold'); doc.setFontSize(15);
+  doc.text('SD NEGERI MODEL TERPADU BOJONEGORO', 105, 12, { align:'center' });
+  doc.setFontSize(10); doc.setFont('helvetica','normal');
+  doc.text('Bukti Pendaftaran - Database SDNMT 2027', 105, 19, { align:'center' });
+  doc.setFontSize(9);
+  doc.text('No. Inden: ' + d.id, 105, 26, { align:'center' });
+  doc.setTextColor(30, 58, 138); doc.setFontSize(12); doc.setFont('helvetica','bold');
+  doc.text('A. DATA SISWA', 15, 45);
+  doc.autoTable({
+    startY: 48,
+    body: [
+      ['Nama Lengkap', d.nama || '-'], ['NISN', d.nisn || '-'],
+      ['Jenis Kelamin', d.jk === 'L' ? 'Laki-laki' : 'Perempuan'],
+      ['Tempat, Tanggal Lahir', (d.tempatLahir || '-') + ', ' + (d.tglLahir || '-')],
+      ['Usia', d.umur || '-'], ['NIK Siswa', d.nik || '-'], ['No. Kartu Keluarga', d.noKK || '-'], ['Agama', d.agama || '-'],
+      ['Asal Sekolah', d.asalSekolah || '-'],
+      ['Alamat', (d.alamat || '-') + ' RT/RW ' + (d.rtrw || '-')],
+      ['Desa/Kelurahan', d.desa || '-'], ['Kecamatan', d.kecamatan || '-'],
+      ['Kabupaten', d.kabupaten || '-'], ['Provinsi', d.provinsi || '-'],
+      ['Kode Pos', d.kodepos || '-'], ['Jarak ke Sekolah', d.jarak || '-']
+    ],
+    theme: 'grid', styles: { fontSize: 9, cellPadding: 2 },
+    columnStyles: { 0: { fontStyle: 'bold', cellWidth: 55, fillColor: [239, 246, 255] } }
+  });
+  doc.setFontSize(12); doc.setFont('helvetica','bold'); doc.setTextColor(30, 58, 138);
+  doc.text('B. DATA ORANG TUA & WALI', 15, doc.lastAutoTable.finalY + 10);
+  doc.autoTable({
+    startY: doc.lastAutoTable.finalY + 13,
+    body: [
+      ['Nama Ayah', d.namaAyah || '-'], ['Pekerjaan Ayah', d.kerjaAyah || '-'], ['Gaji Ayah', d.gajiAyah || '-'],
+      ['Nama Ibu', d.namaIbu || '-'], ['Pekerjaan Ibu', d.kerjaIbu || '-'], ['Gaji Ibu', d.gajiIbu || '-'],
+      ['Nama Wali', d.waliSiswa || '-'], ['Pekerjaan Wali', d.kerjaWali || '-'], ['Gaji Wali', d.gajiWali || '-'],
+      ['No. HP', d.hpOrtu || '-'], ['Email', d.email || '-']
+    ],
+    theme: 'grid', styles: { fontSize: 9, cellPadding: 2 },
+    columnStyles: { 0: { fontStyle: 'bold', cellWidth: 55, fillColor: [239, 246, 255] } }
+  });
+  var finalY = doc.lastAutoTable.finalY + 15;
+  doc.setFontSize(10); doc.setTextColor(30, 58, 138); doc.setFont('helvetica','bold');
+  doc.text('Bojonegoro, ' + new Date().toLocaleDateString('id-ID'), 150, finalY);
+  doc.setFont('helvetica','normal');
+  doc.text('Administrator,', 150, finalY + 6);
+  doc.text('SD Negeri Model Terpadu Bojonegoro', 150, finalY + 22, { maxWidth: 55 });
+  doc.setFontSize(9); doc.setTextColor(120,120,120);
+  doc.text('by administrator SD Negeri Model Terpadu Bojonegoro', 105, 290, { align: 'center' });
+  doc.save('Bukti-' + (d.nama || 'Siswa').replace(/\s+/g, '_') + '.pdf');
+}
+
+function downloadDatabasePDF(){
+  if(!isAdmin){ alert('Hanya admin!'); return; }
+  if(dataInden.length === 0){ alert('Belum ada data.'); return; }
+  var jsPDF = window.jspdf.jsPDF;
+  var doc = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
+  var sorted = dataInden.slice().sort(function(a, b){ return (a.jarakNum || 99999) - (b.jarakNum || 99999); });
+  var total = sorted.length;
+  var l = sorted.filter(function(d){ return d.jk === 'L'; }).length;
+  var p = sorted.filter(function(d){ return d.jk === 'P'; }).length;
+  doc.setFillColor(30, 58, 138); doc.rect(0, 0, 297, 30, 'F');
+  doc.setTextColor(255, 255, 255); doc.setFont('helvetica','bold'); doc.setFontSize(16);
+  doc.text('DATABASE SDNMT 2027 - SD NEGERI MODEL TERPADU BOJONEGORO', 148, 13, { align:'center' });
+  doc.setFontSize(10); doc.setFont('helvetica','normal');
+  doc.text('Diurutkan berdasarkan jarak rumah ke sekolah', 148, 20, { align:'center' });
+  doc.setFontSize(9);
+  doc.text('Dicetak: ' + new Date().toLocaleString('id-ID'), 148, 26, { align:'center' });
+  doc.setTextColor(30, 58, 138); doc.setFontSize(10); doc.setFont('helvetica','bold');
+  doc.text('Total: ' + total + '  |  L: ' + l + '  |  P: ' + p + '  |  Sisa Kuota: ' + Math.max(0, 84 - total), 15, 40);
+  var rows = sorted.map(function(d, i){
+    var wilayah = (d.desa || '-') + ', Kec. ' + (d.kecamatan || '-');
+    return [i+1, d.nama || '-', d.jk || '-', d.umur || '-', d.asalSekolah || '-', d.waliSiswa || '-', d.jarak || '-', wilayah, d.hpOrtu || '-'];
+  });
+  doc.autoTable({
+    startY: 45,
+    head: [['No','Nama Siswa','JK','Usia','Asal Sekolah','Wali','Jarak','Wilayah','No. HP']],
+    body: rows,
+    styles: { fontSize: 7, cellPadding: 1.5 },
+    headStyles: { fillColor: [30, 58, 138], textColor: [255,255,255], fontStyle: 'bold', halign: 'center' },
+    alternateRowStyles: { fillColor: [239, 246, 255] },
+    didDrawPage: function(){
+      doc.setFontSize(9); doc.setTextColor(120,120,120);
+      doc.text('by administrator SD Negeri Model Terpadu Bojonegoro', 148, 200, { align: 'center' });
+    }
+  });
+  doc.save('Database-SDNMT-2027-' + new Date().toISOString().slice(0,10) + '.pdf');
+}
+
+function downloadDatabaseExcel(){
+  if(!isAdmin){ alert('Hanya admin!'); return; }
+  if(dataInden.length === 0){ alert('Belum ada data.'); return; }
+  var sorted = dataInden.slice().sort(function(a, b){ return (a.jarakNum || 99999) - (b.jarakNum || 99999); });
+  var excelData = sorted.map(function(d, i){
+    return {
+      'No': i+1, 'Nama Lengkap': d.nama || '-', 'NISN': d.nisn || '-',
+      'Jenis Kelamin': d.jk === 'L' ? 'Laki-laki' : 'Perempuan',
+      'Tempat Lahir': d.tempatLahir || '-', 'Tanggal Lahir': d.tglLahir || '-', 'Usia': d.umur || '-',
+      'NIK Siswa': d.nik || '-', 'No. Kartu Keluarga': d.noKK || '-', 'Agama': d.agama || '-',
+      'Asal Sekolah': d.asalSekolah || '-', 'Alamat': d.alamat || '-', 'RT/RW': d.rtrw || '-',
+      'Desa/Kelurahan': d.desa || '-', 'Kecamatan': d.kecamatan || '-', 'Kabupaten': d.kabupaten || '-',
+      'Provinsi': d.provinsi || '-', 'Kode Pos': d.kodepos || '-', 'Wilayah': d.modeWilayah || '-',
+      'Latitude': d.lat || '-', 'Longitude': d.lng || '-', 'Jarak ke Sekolah (km)': d.jarak || '-',
+      'Nama Ayah': d.namaAyah || '-', 'Pekerjaan Ayah': d.kerjaAyah || '-', 'Gaji Ayah': d.gajiAyah || '-',
+      'Nama Ibu': d.namaIbu || '-', 'Pekerjaan Ibu': d.kerjaIbu || '-', 'Gaji Ibu': d.gajiIbu || '-',
+      'Nama Wali': d.waliSiswa || '-', 'Pekerjaan Wali': d.kerjaWali || '-', 'Gaji Wali': d.gajiWali || '-',
+      'No. HP': d.hpOrtu || '-', 'Email': d.email || '-', 'Tanggal Daftar': d.tglDaftar || '-'
+    };
+  });
+  var ws = XLSX.utils.json_to_sheet(excelData);
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Database SDNMT 2027');
+  XLSX.writeFile(wb, 'Database-SDNMT-2027-' + new Date().toISOString().slice(0,10) + '.xlsx');
+}
+
+/* LOGIN */
+function toggleLogin(){
+  if(isAdmin){
+    if(!confirm('Logout dari mode admin?')) return;
+    isAdmin = false;
+
+    /* Paksa kembali ke Dashboard jika sedang di Pengaturan */
+    if(!document.getElementById('page-pengaturan').classList.contains('hidden')){
+      showPage('dashboard');
+    }
+
+    /* Sembunyikan menu Pengaturan */
+    var mp = document.getElementById('menuPengaturan');
+    if(mp){
+      mp.classList.add('hidden');
+      mp.style.display = 'none';
+    }
+
+    updateAdminControls();
+    renderTabel();
+    alert('Anda telah logout. Menu Pengaturan disembunyikan.');
+    return;
+  }
+  var m = document.getElementById('modalLogin');
+  m.classList.remove('hidden');
+  m.classList.add('flex');
+  document.getElementById('inUser').focus();
+}
+
+function closeLogin(){
+  var m = document.getElementById('modalLogin');
+  m.classList.add('hidden');
+  m.classList.remove('flex');
+  document.getElementById('inUser').value = '';
+  document.getElementById('inPass').value = '';
+}
+
+function doLogin(){
+  var u = document.getElementById('inUser').value.trim();
+  var p = document.getElementById('inPass').value.trim();
+  if(u === 'admin' && p === 'sdnmt'){
+    isAdmin = true;
+    updateAdminControls();
+    renderTabel();
+    closeLogin();
+    alert('Login admin berhasil!\n\nMenu Pengaturan tersedia di sidebar.');
+  } else {
+    alert('Username / password salah');
+  }
+}
+
+function updateAdminControls(){
+  var badge = document.getElementById('adminBadge');
+  var btnText = document.getElementById('loginBtnText');
+  var btnDownloadPDF = document.getElementById('btnDownloadPDF');
+  var btnDownloadExcel = document.getElementById('btnDownloadExcel');
+  var infoDownloadDaftar = document.getElementById('infoDownloadDaftar');
+  var adminActionInfo = document.getElementById('adminActionInfo');
+  var menuPengaturan = document.getElementById('menuPengaturan');
+
+  if(isAdmin){
+    badge.classList.remove('hidden');
+    btnText.textContent = 'Logout';
+    btnDownloadPDF.classList.remove('hidden');
+    btnDownloadExcel.classList.remove('hidden');
+    infoDownloadDaftar.classList.add('hidden');
+    if(adminActionInfo) adminActionInfo.classList.remove('hidden');
+
+    /* Tampilkan menu Pengaturan */
+    if(menuPengaturan){
+      menuPengaturan.classList.remove('hidden');
+      menuPengaturan.style.display = 'flex';
+    }
+  } else {
+    badge.classList.add('hidden');
+    btnText.textContent = 'Login Admin';
+    btnDownloadPDF.classList.add('hidden');
+    btnDownloadExcel.classList.add('hidden');
+    infoDownloadDaftar.classList.remove('hidden');
+    if(adminActionInfo) adminActionInfo.classList.add('hidden');
+
+    /* Sembunyikan menu Pengaturan */
+    if(menuPengaturan){
+      menuPengaturan.classList.add('hidden');
+      menuPengaturan.style.display = 'none';
+    }
+  }
+}
+
+/* CHART */
+function renderChart(){
+  var total = dataInden.length;
+  var l = 0, p = 0;
+  for(var i = 0; i < dataInden.length; i++){
+    if(dataInden[i].jk === 'L') l++;
+    else if(dataInden[i].jk === 'P') p++;
+  }
+  document.getElementById('totalInden').textContent = total;
+  document.getElementById('labelInden').textContent = total;
+  document.getElementById('labelL').textContent = l;
+  document.getElementById('labelP').textContent = p;
+  document.getElementById('persenL').textContent = (total ? ((l / total) * 100).toFixed(1) : '0') + '%';
+  document.getElementById('persenP').textContent = (total ? ((p / total) * 100).toFixed(1) : '0') + '%';
+
+  if(chartInden) chartInden.destroy();
+  chartInden = new Chart(document.getElementById('chartInden'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Data Masuk', 'Sisa Kuota'],
+      datasets: [{ data: [total, Math.max(0, 84 - total)], backgroundColor: ['#1e3a8a', '#e2e8f0'], borderWidth: 0 }]
+    },
+    options: { cutout: '70%', plugins: { legend: { position: 'bottom' } } }
+  });
+
+  if(chartGender) chartGender.destroy();
+  chartGender = new Chart(document.getElementById('chartGender'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Laki-laki', 'Perempuan'],
+      datasets: [{ data: [l, p], backgroundColor: ['#3b82f6', '#ec4899'], borderWidth: 0 }]
+    },
+    options: { cutout: '65%', plugins: { legend: { position: 'bottom' } } }
+  });
+}
+</script>
+</body>
+</html>
